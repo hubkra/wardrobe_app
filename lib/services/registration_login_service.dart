@@ -22,19 +22,18 @@ class BackendService {
     }
   }
 
-  Future<User> loginUser(User user) async {
+  Future<dynamic> loginUser(User user) async {
+    final url = Uri.parse('http://localhost:8080/login');
     final response = await http.post(
-      Uri.parse('$baseUrl/login'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(user.toJson()),
+      url,
+      body: json.encode(user.toJson()),
+      headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
+      return json.decode(response.body);
     } else {
-      throw Exception('Wystąpił problem podczas logowania.');
+      throw Exception('Failed to login: ${response.statusCode}');
     }
   }
 }

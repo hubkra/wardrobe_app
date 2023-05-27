@@ -1,11 +1,11 @@
 class User {
   final String emailId;
-  final String userName;
+  final String? userName;
   final String password;
 
   User({
     required this.emailId,
-    required this.userName,
+    this.userName,
     required this.password,
   });
 
