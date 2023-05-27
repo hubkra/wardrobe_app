@@ -72,8 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
-                      controller:
-                          _emailIdController, // Connect the controller here
+                      controller: _emailIdController,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Email',
@@ -97,8 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
-                      controller:
-                          _passwordController, // Connect the controller here
+                      controller: _passwordController,
                       obscureText: true,
                       decoration: const InputDecoration(
                         border: InputBorder.none,
@@ -139,8 +137,6 @@ class _LoginPageState extends State<LoginPage> {
                         emailId: emailId,
                         password: password,
                       );
-                      print('Email: $emailId');
-                      print('Password: $password');
 
                       // Call the loginUser method from the backendService instance
                       backendService.loginUser(user).then((response) {

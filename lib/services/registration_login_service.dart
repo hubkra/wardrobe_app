@@ -23,7 +23,7 @@ class BackendService {
   }
 
   Future<dynamic> loginUser(User user) async {
-    final url = Uri.parse('http://localhost:8080/login');
+    final url = Uri.parse('$baseUrl/login');
     final response = await http.post(
       url,
       body: json.encode(user.toJson()),
