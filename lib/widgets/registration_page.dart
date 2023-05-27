@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -20,6 +21,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isEmailValid = true;
+  bool isPasswordValid = true;
+  Timer? _emailValidationTimer;
+  Timer? _passwordValidationTimer;
 
   @override
   void dispose() {
@@ -61,16 +66,36 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
-                    border: Border.all(color: Colors.white),
+                    border: Border.all(
+                      color: isEmailValid
+                          ? Colors.white
+                          : Colors.red, // Use isEmailValid variable
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
                       controller: _emailIdController,
-                      decoration: const InputDecoration(
+                      onChanged: (value) {
+                        // Reset previous timer if any
+                        _emailValidationTimer?.cancel();
+
+                        // Start a new timer for email validation
+                        _emailValidationTimer =
+                            Timer(const Duration(milliseconds: 500), () {
+                          // Validate email after the timeout
+                          setState(() {
+                            isEmailValid = value.isEmpty || value.contains('@');
+                          });
+                        });
+                      },
+                      decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Email',
+                        errorText: isEmailValid
+                            ? null
+                            : 'Invalid email', // Show error message
                       ),
                     ),
                   ),
@@ -109,17 +134,37 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
-                    border: Border.all(color: Colors.white),
+                    border: Border.all(
+                      color: isPasswordValid
+                          ? Colors.white
+                          : Colors.red, // Use isPasswordValid variable
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: TextField(
                       controller: _passwordController,
+                      onChanged: (value) {
+                        // Reset previous timer if any
+                        _passwordValidationTimer?.cancel();
+
+                        // Start a new timer for password validation
+                        _passwordValidationTimer =
+                            Timer(const Duration(milliseconds: 500), () {
+                          // Validate password after the timeout
+                          setState(() {
+                            isPasswordValid = value.length >= 6;
+                          });
+                        });
+                      },
                       obscureText: true,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Password',
+                        errorText: isPasswordValid
+                            ? null
+                            : 'Invalid password minimum 6 characters', // Show error message
                       ),
                     ),
                   ),
@@ -148,19 +193,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                     ),
                     onPressed: () {
-                      // Get emailId, username, and password from the text fields
                       String emailId = _emailIdController.text;
                       String username = _usernameController.text;
                       String password = _passwordController.text;
 
-                      // Create a User object with the entered data
+                      if (!emailId.contains('@')) {
+                        // Display error message for invalid email
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Invalid email format')),
+                        );
+                        return; // Exit the callback function
+                      }
+
                       User user = User(
                         emailId: emailId,
                         userName: username,
                         password: password,
                       );
 
-                      // Call the registerUser method from the backendService instance
                       backendService.registerUser(user).then((user) {
                         // Display success message
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -168,7 +218,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               content: Text('Registration successful!')),
                         );
 
-                        // Navigate back to LoginPage
                         Navigator.pop(context);
                       }).catchError((error) {
                         // Handle registration error
