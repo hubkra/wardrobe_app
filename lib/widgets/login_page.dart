@@ -152,7 +152,9 @@ class _LoginPageState extends State<LoginPage> {
                         // Navigate to the next screen after successful login
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  HomePage(username: emailId)),
                         );
                       }).catchError((error) {
                         // Handle login error
