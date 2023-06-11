@@ -101,25 +101,11 @@ class _WardrobePageState extends State<WardrobePage> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AddClothesForm(
-                        onAddClothes: _addClothes,
-                      );
-                    },
-                  );
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Add Clothes'),
-              ),
-              ListView.builder(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: _wardrobes.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -150,8 +136,31 @@ class _WardrobePageState extends State<WardrobePage> {
                   );
                 },
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.deepPurple.shade800,
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AddClothesForm(
+                          onAddClothes: _addClothes,
+                        );
+                      },
+                    );
+                  },
+                  child: const Icon(
+                    Icons.add,
+                    size: 32.0,
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -253,6 +262,9 @@ class _AddClothesFormState extends State<AddClothesForm> {
                   Navigator.of(context).pop();
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple.shade800,
+              ),
               child: const Text('Add'),
             ),
           ],
@@ -371,6 +383,9 @@ class _EditClothesFormState extends State<EditClothesForm> {
                   Navigator.of(context).pop();
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple.shade800,
+              ),
               child: const Text('Save'),
             ),
           ],
