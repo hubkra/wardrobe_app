@@ -18,6 +18,7 @@ class _WardrobePageState extends State<WardrobePage> {
   late int _currentIndex;
   late WardrobeService _wardrobeService;
   List<Wardrobe> _wardrobes = [];
+  List<Wardrobe> _filteredWardrobes = [];
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _WardrobePageState extends State<WardrobePage> {
       final clothes = await _wardrobeService.findClothes();
       setState(() {
         _wardrobes = clothes;
+        _filteredWardrobes = List.from(_wardrobes);
       });
     } catch (error) {
       // Handle error
@@ -55,6 +57,7 @@ class _WardrobePageState extends State<WardrobePage> {
         await _wardrobeService.deleteClothes(id);
         setState(() {
           _wardrobes.removeWhere((wardrobe) => wardrobe.id == id);
+          _filteredWardrobes.removeWhere((wardrobe) => wardrobe.id == id);
         });
       } catch (error) {
         // Handle error
@@ -71,6 +74,7 @@ class _WardrobePageState extends State<WardrobePage> {
             .indexWhere((wardrobe) => wardrobe.id == updatedClothes.id);
         if (index != -1) {
           _wardrobes[index] = updatedClothes;
+          _filteredWardrobes[index] = updatedClothes;
         }
       });
     } catch (error) {
@@ -96,6 +100,22 @@ class _WardrobePageState extends State<WardrobePage> {
     });
   }
 
+  void _filterWardrobes(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredWardrobes = List.from(_wardrobes);
+      } else {
+        _filteredWardrobes = _wardrobes
+            .where((wardrobe) =>
+                wardrobe.name.toLowerCase().contains(query.toLowerCase()) ||
+                wardrobe.typeClothes
+                    .toLowerCase()
+                    .contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,38 +124,84 @@ class _WardrobePageState extends State<WardrobePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: _wardrobes.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final wardrobe = _wardrobes[index];
-                  return ListTile(
-                    title: Text(wardrobe.name),
-                    subtitle: Text(wardrobe.typeClothes),
-                    leading: wardrobe.imageUrl.isNotEmpty
-                        ? Image.network(wardrobe.imageUrl)
-                        : const Icon(Icons.checkroom),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            _handleEdit(wardrobe);
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            _deleteClothes(wardrobe.id);
-                          },
-                        ),
-                      ],
-                    ),
-                  );
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Wyszukaj',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                onChanged: (value) {
+                  _filterWardrobes(value);
                 },
               ),
+            ),
+            Expanded(
+              child: _filteredWardrobes.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'Nie masz żadnej rzeczy w szafie, dodaje je klikajac ikonkę plusa',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _filteredWardrobes.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final wardrobe = _filteredWardrobes[index];
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          margin: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            title: Text(wardrobe.name),
+                            subtitle: Text(wardrobe.typeClothes),
+                            leading: wardrobe.imageUrl.isNotEmpty
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      wardrobe.imageUrl,
+                                      height: 200,
+                                      fit: BoxFit.cover,
+                                      filterQuality: FilterQuality.high,
+                                    ),
+                                  )
+                                : const Icon(Icons.checkroom),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.blueAccent,
+                                  ),
+                                  onPressed: () {
+                                    _handleEdit(wardrobe);
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.redAccent,
+                                  ),
+                                  onPressed: () {
+                                    _deleteClothes(wardrobe.id);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
@@ -279,11 +345,13 @@ class EditClothesForm extends StatefulWidget {
   final Function(Wardrobe) onEditClothes;
 
   const EditClothesForm({
+    super.key,
     required this.wardrobe,
     required this.onEditClothes,
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _EditClothesFormState createState() => _EditClothesFormState();
 }
 
