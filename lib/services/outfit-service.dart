@@ -41,5 +41,19 @@ class OutfitService {
     }
   }
 
+  Future<Outfit> fetchOutfitById(int id) async {
+    final response =
+        await http.get(Uri.parse('http://localhost:8080/api/outfits/$id'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> json = jsonDecode(response.body);
+      final Outfit outfit = Outfit.fromJson(json);
+      return outfit;
+    } else {
+      throw Exception(
+          'Failed to fetch outfit with status code: ${response.statusCode}.');
+    }
+  }
+
   // Pozostałe metody serwisu...
 }

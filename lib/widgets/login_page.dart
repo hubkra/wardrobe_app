@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wardrobe_app/widgets/registration_page.dart';
 
+import '../models/outfit.dart';
 import '../models/user.dart';
+import '../services/outfit-service.dart';
 import '../services/registration_login_service.dart';
 import 'home_page.dart';
 
@@ -17,6 +21,35 @@ class _LoginPageState extends State<LoginPage> {
   final BackendService backendService = BackendService();
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final OutfitService _outfitService = OutfitService();
+  List<Outfit> _outfits = [];
+
+  void initState() {
+    super.initState();
+    _fetchOutfits();
+  }
+
+  Future<void> _fetchOutfits() async {
+    try {
+      List<Outfit> outfits = await _outfitService.fetchOutfits();
+      setState(() {
+        _outfits = outfits;
+      });
+    } catch (error) {
+      // Handle error if fetching outfits fails
+      print('Error fetching outfits: $error');
+    }
+  }
+
+  int _getRandomOutfitId() {
+    if (_outfits.isEmpty) {
+      return 0;
+    } else {
+      Random random = Random();
+      int randomIndex = random.nextInt(_outfits.length);
+      return _outfits[randomIndex].id;
+    }
+  }
 
   @override
   void dispose() {
@@ -138,6 +171,8 @@ class _LoginPageState extends State<LoginPage> {
                         password: password,
                       );
 
+                      int outfitId = _getRandomOutfitId();
+
                       // Call the loginUser method from the backendService instance
                       backendService.loginUser(user).then((response) {
                         // Handle the login response
@@ -153,8 +188,8 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  HomePage(username: emailId)),
+                              builder: (context) => HomePage(
+                                  username: emailId, outfitId: outfitId)),
                         );
                       }).catchError((error) {
                         // Handle login error

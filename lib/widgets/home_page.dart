@@ -10,8 +10,10 @@ import 'wardrobe_page.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
+  final int outfitId;
 
-  const HomePage({Key? key, required this.username}) : super(key: key);
+  const HomePage({Key? key, required this.username, required this.outfitId})
+      : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -26,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages.addAll([
-      HomePageContent(username: widget.username),
+      HomePageContent(username: widget.username, outfitId: widget.outfitId),
       WardrobePage(),
       SettingsPage(),
       ProfilePage(),
@@ -88,10 +90,14 @@ class _HomePageState extends State<HomePage> {
 
 class HomePageContent extends StatefulWidget {
   final String username;
+  final int outfitId;
 
-  const HomePageContent({required this.username});
+  const HomePageContent(
+      {Key? key, required this.username, required this.outfitId})
+      : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomePageContentState createState() => _HomePageContentState();
 }
 
@@ -124,7 +130,7 @@ class _HomePageContentState extends State<HomePageContent> {
       );
     } else {
       return Container(
-        height: 200, // Dowolna wartość
+        height: 200,
         width: double.infinity,
         color: Colors.grey[200],
         child: ListView.builder(
@@ -132,9 +138,8 @@ class _HomePageContentState extends State<HomePageContent> {
           itemCount: _outfitItems.length,
           itemBuilder: (context, index) {
             // Wyświetl elementy outfitu
-            // Możesz dostosować wygląd w zależności od potrzeb
             return Container(
-              width: 100, // Dowolna wartość
+              width: 100,
               child: Column(
                 children: [
                   Text(_outfitItems[index].name),
@@ -196,7 +201,7 @@ class _HomePageContentState extends State<HomePageContent> {
                   ),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: OutfitsCard(),
+                    child: OutfitsCard(outfitId: widget.outfitId),
                   ),
                 ],
               ),
