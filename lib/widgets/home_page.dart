@@ -5,6 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:wardrobe_app/widgets/profile_page.dart';
 import 'package:wardrobe_app/widgets/settings_page.dart';
 import '../models/wardrobe.dart';
+import 'outfits-card.dart';
 import 'wardrobe_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -175,7 +176,7 @@ class _HomePageContentState extends State<HomePageContent> {
           Expanded(
             child: Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
                   Text(
@@ -194,7 +195,9 @@ class _HomePageContentState extends State<HomePageContent> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _buildOutfitContainer(),
+                  Expanded(
+                    child: OutfitsCard(),
+                  ),
                 ],
               ),
             ),
