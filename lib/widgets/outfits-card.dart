@@ -34,7 +34,7 @@ class _OutfitsCardState extends State<OutfitsCard> {
             child: CircularProgressIndicator(),
           );
         } else if (snapshot.hasError || !snapshot.hasData) {
-          return Center(
+          return const Center(
             child: Text('Error: Unable to fetch outfit.'),
           );
         } else {
@@ -50,28 +50,42 @@ class _OutfitsCardState extends State<OutfitsCard> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    height: 120,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
+                  Expanded(
+                    // Wrap Expanded around GridView.builder
+                    child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
                       itemCount: outfit.wardrobeItems.length,
                       itemBuilder: (context, itemIndex) {
                         final Wardrobe wardrobeItem =
                             outfit.wardrobeItems[itemIndex];
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Item: ${wardrobeItem.name}'),
-                            Text('Type: ${wardrobeItem.typeClothes}'),
-                            Image.network(
-                              wardrobeItem.imageUrl,
-                              height: 80,
-                              width: 80,
-                              fit: BoxFit.cover,
-                            ),
-                            const SizedBox(height: 8),
-                          ],
+                        return Container(
+                          alignment: Alignment.center,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Item: ${wardrobeItem.name}'),
+                              Text('Type: ${wardrobeItem.typeClothes}'),
+                              Flexible(
+                                child: AspectRatio(
+                                  aspectRatio:
+                                      1, // Ensure a square aspect ratio
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      wardrobeItem.imageUrl,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
                         );
                       },
                     ),

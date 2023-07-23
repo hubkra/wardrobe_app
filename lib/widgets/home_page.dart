@@ -200,9 +200,16 @@ class _HomePageContentState extends State<HomePageContent> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Expanded(
-                    child: OutfitsCard(outfitId: widget.outfitId),
-                  ),
+                  Wrap(
+                    spacing: 20,
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width - 40,
+                        height: 550,
+                        child: OutfitsCard(outfitId: widget.outfitId),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
