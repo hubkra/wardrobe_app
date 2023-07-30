@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/wardrobe.dart';
+import '../services/outfit-service.dart';
 import '../services/wardrobe_service.dart';
 import '../shared/enums/size_information.dart';
 import '../shared/enums/size_information_extension.dart';
@@ -380,6 +381,16 @@ class AddOutfitForm extends StatefulWidget {
 
 class _AddOutfitFormState extends State<AddOutfitForm> {
   List<Wardrobe> selectedItems = [];
+  final OutfitService _outfitService = OutfitService();
+
+  Future<void> _createOutfitOnServer() async {
+    try {
+      final newOutfit = await _outfitService.createOutfit(selectedItems);
+      // Handle success, show a message, etc.
+    } catch (error) {
+      // Handle error
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -420,7 +431,7 @@ class _AddOutfitFormState extends State<AddOutfitForm> {
           ),
           ElevatedButton(
             onPressed: () {
-              widget.onCreateOutfit(selectedItems);
+              _createOutfitOnServer();
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
