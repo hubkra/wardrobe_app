@@ -190,7 +190,7 @@ class _WardrobePageState extends State<WardrobePage> {
                                 IconButton(
                                   icon: const Icon(
                                     Icons.edit,
-                                    color: Colors.blueAccent,
+                                    color: Color.fromARGB(255, 69, 39, 160),
                                   ),
                                   onPressed: () {
                                     _handleEdit(wardrobe);
@@ -235,22 +235,39 @@ class _WardrobePageState extends State<WardrobePage> {
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AddOutfitForm(
-                      wardrobeItems: _wardrobes,
-                      onCreateOutfit: _createOutfit,
+            SizedBox(
+              width: 16.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: ElevatedButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AddOutfitForm(
+                          wardrobeItems: _wardrobes,
+                          onCreateOutfit: _createOutfit,
+                        );
+                      },
                     );
                   },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple.shade800,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple.shade800,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    padding: EdgeInsets.zero,
+                    elevation: 4.0,
+                  ),
+                  child: const Icon(
+                    Icons.checkroom_rounded,
+                    size: 32.0,
+                  ),
+                ),
               ),
-              child: const Text('Dodaj Stroj'),
             ),
           ],
         ),
