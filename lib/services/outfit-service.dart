@@ -20,24 +20,13 @@ class OutfitService {
     }
   }
 
-  Future<Outfit> createOutfit(List<Wardrobe> wardrobeItems) async {
-    final List wardrobeJsonList = wardrobeItems.map((e) => e.toJson()).toList();
-    final Map<String, dynamic> requestBody = {
-      'wardrobeItems': wardrobeJsonList
-    };
-
-    final response = await http.post(
-      Uri.parse('http://localhost:8080/api/outfits'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(requestBody),
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> json = jsonDecode(response.body);
-      final Outfit newOutfit = Outfit.fromJson(json);
-      return newOutfit;
-    } else {
-      throw Exception('Request failed with status: ${response.statusCode}.');
+  Future<void> _createOutfit(List<Wardrobe> wardrobeItems) async {
+    try {
+      final newOutfit = await _createOutfit(wardrobeItems);
+      // Możesz coś zrobić z nowym strojem, jeśli to konieczne
+      // np. wyświetlić go na ekranie lub zaktualizować listę strojów
+    } catch (error) {
+      // Obsłuż błąd, jeśli wystąpił
     }
   }
 
