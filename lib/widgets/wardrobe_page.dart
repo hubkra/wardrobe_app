@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wardrobe_app/models/outfit.dart';
 
 import '../models/wardrobe.dart';
 import '../services/outfit-service.dart';
@@ -18,15 +19,19 @@ class WardrobePage extends StatefulWidget {
 class _WardrobePageState extends State<WardrobePage> {
   late int _currentIndex;
   late WardrobeService _wardrobeService;
+  late OutfitService _outfitService;
   List<Wardrobe> _wardrobes = [];
   List<Wardrobe> _filteredWardrobes = [];
+  List<Outfit> _outfits = [];
 
   @override
   void initState() {
     super.initState();
     _currentIndex = 1;
     _wardrobeService = WardrobeService();
+    _outfitService = OutfitService();
     _fetchClothes();
+    _fetchOutfits();
   }
 
   Future<void> _fetchClothes() async {
@@ -36,6 +41,30 @@ class _WardrobePageState extends State<WardrobePage> {
         _wardrobes = clothes;
         _filteredWardrobes = List.from(_wardrobes);
       });
+    } catch (error) {
+      // Handle error
+    }
+  }
+
+  Future<void> _fetchOutfits() async {
+    try {
+      final outfits = await _outfitService.fetchOutfits();
+      setState(() {
+        _outfits = outfits;
+      });
+    } catch (error) {
+      // Handle error
+    }
+  }
+
+  Future<void> _deleteOutfit(int id) async {
+    try {
+      print("Before deletion: $_outfits");
+      await _outfitService.deleteOutfit(id);
+      setState(() {
+        _outfits.removeWhere((outfit) => outfit.id == id);
+      });
+      _fetchOutfits();
     } catch (error) {
       // Handle error
     }
@@ -60,6 +89,7 @@ class _WardrobePageState extends State<WardrobePage> {
           _wardrobes.removeWhere((wardrobe) => wardrobe.id == id);
           _filteredWardrobes.removeWhere((wardrobe) => wardrobe.id == id);
         });
+        _fetchOutfits();
       } catch (error) {
         // Handle error
       }
@@ -85,9 +115,13 @@ class _WardrobePageState extends State<WardrobePage> {
 
   Future<void> _createOutfit(List<Wardrobe> wardrobeItems) async {
     try {
-      final newOutfit = await _createOutfit(wardrobeItems);
+      final newOutfit = await _outfitService.createOutfit(wardrobeItems);
+
+      setState(() {
+        _outfits.add(newOutfit);
+      });
     } catch (error) {
-      // Obsłuż błąd, jeśli wystąpił
+      // Handle error
     }
   }
 
@@ -211,6 +245,52 @@ class _WardrobePageState extends State<WardrobePage> {
                         );
                       },
                     ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _outfits.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final outfit = _outfits[index];
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTile(
+                        title: Text(outfit.id.toString()),
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: outfit.wardrobeItems.length,
+                        itemBuilder: (BuildContext context, int wardrobeIndex) {
+                          final wardrobeItem =
+                              outfit.wardrobeItems[wardrobeIndex];
+                          return Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            margin: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              title: Text(wardrobeItem.name),
+                              subtitle: Text(wardrobeItem.typeClothes),
+                            ),
+                          );
+                        },
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.redAccent),
+                            onPressed: () {
+                              _deleteOutfit(outfit.id);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),

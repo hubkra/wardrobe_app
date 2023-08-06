@@ -54,5 +54,15 @@ class OutfitService {
     }
   }
 
-  // Pozostałe metody serwisu...
+  Future<void> deleteOutfit(int id) async {
+    final response = await http.delete(
+      Uri.parse('http://localhost:8080/api/outfits/$id'),
+    );
+
+    if (response.statusCode == 200) {
+      // Outfit usunięty pomyślnie
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}.');
+    }
+  }
 }
