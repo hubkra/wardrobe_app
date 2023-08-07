@@ -27,46 +27,44 @@ class _WardrobePageState extends State<WardrobePage> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = 1;
+    _currentIndex = 0;
     _wardrobeService = WardrobeService();
     _outfitService = OutfitService();
     _fetchClothes();
     _fetchOutfits();
   }
 
-  Future<void> _fetchClothes() async {
+  Future<List<Wardrobe>> _fetchClothes() async {
     try {
       final clothes = await _wardrobeService.findClothes();
-      setState(() {
-        _wardrobes = clothes;
-        _filteredWardrobes = List.from(_wardrobes);
-      });
+      return clothes;
     } catch (error) {
       // Handle error
+      return [];
     }
   }
 
-  Future<void> _fetchOutfits() async {
+  Future<List<Outfit>> _fetchOutfits() async {
     try {
       final outfits = await _outfitService.fetchOutfits();
-      setState(() {
-        _outfits = outfits;
-      });
+      return outfits;
     } catch (error) {
       // Handle error
+      return [];
     }
   }
 
-  Future<void> _deleteOutfit(int id) async {
-    try {
-      print("Before deletion: $_outfits");
-      await _outfitService.deleteOutfit(id);
-      setState(() {
-        _outfits.removeWhere((outfit) => outfit.id == id);
-      });
-      _fetchOutfits();
-    } catch (error) {
-      // Handle error
+  Future<void> _deleteOutfit(int? id) async {
+    if (id != null) {
+      try {
+        await _outfitService.deleteOutfit(id);
+        setState(() {
+          _outfits.removeWhere((outfit) => outfit.id == id);
+        });
+      } catch (error) {
+        print("Error deleting outfit: $error");
+        // Handle error
+      }
     }
   }
 
@@ -89,7 +87,6 @@ class _WardrobePageState extends State<WardrobePage> {
           _wardrobes.removeWhere((wardrobe) => wardrobe.id == id);
           _filteredWardrobes.removeWhere((wardrobe) => wardrobe.id == id);
         });
-        _fetchOutfits();
       } catch (error) {
         // Handle error
       }
@@ -116,7 +113,6 @@ class _WardrobePageState extends State<WardrobePage> {
   Future<void> _createOutfit(List<Wardrobe> wardrobeItems) async {
     try {
       final newOutfit = await _outfitService.createOutfit(wardrobeItems);
-
       setState(() {
         _outfits.add(newOutfit);
       });
@@ -165,7 +161,7 @@ class _WardrobePageState extends State<WardrobePage> {
       backgroundColor: Colors.grey[300],
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -177,119 +173,157 @@ class _WardrobePageState extends State<WardrobePage> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
-                onChanged: (value) {
-                  _filterWardrobes(value);
+                onChanged: (query) {
+                  _filterWardrobes(query);
                 },
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple.shade800,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _currentIndex = 0; // Show clothes view
+                      });
+                    },
+                    child: Text('Clothes'),
+                  ),
+                  SizedBox(width: 16),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple.shade800,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _currentIndex = 1; // Show outfits view
+                      });
+                    },
+                    child: Text('Outfits'),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
-              child: _filteredWardrobes.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'Nie masz żadnej rzeczy w szafie, dodaje je klikajac ikonkę plusa',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _filteredWardrobes.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final wardrobe = _filteredWardrobes[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          margin: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            title: Text(wardrobe.name),
-                            subtitle: Text(wardrobe.typeClothes),
-                            leading: wardrobe.imageUrl.isNotEmpty
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      wardrobe.imageUrl,
-                                      height: 200,
-                                      fit: BoxFit.cover,
-                                      filterQuality: FilterQuality.high,
-                                    ),
-                                  )
-                                : const Icon(Icons.checkroom),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
+              child: IndexedStack(
+                index: _currentIndex,
+                children: [
+                  // Use FutureBuilder for wardrobe list
+                  FutureBuilder<List<Wardrobe>>(
+                    future: _fetchClothes(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else {
+                        _wardrobes = snapshot.data ?? [];
+                        _filteredWardrobes = List.from(_wardrobes);
+                        return ListView.builder(
+                          itemCount: _filteredWardrobes.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final wardrobe = _filteredWardrobes[index];
+                            return ListTile(
+                              title: Text(wardrobe.name),
+                              subtitle: Text(wardrobe.typeClothes),
+                              leading: wardrobe.imageUrl.isNotEmpty
+                                  ? Image.network(wardrobe.imageUrl)
+                                  : Icon(Icons.checkroom),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    color: Colors.deepPurple.shade800,
+                                    hoverColor: Colors.transparent,
+                                    onPressed: () {
+                                      _handleEdit(wardrobe);
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    hoverColor: Colors.transparent,
+                                    color: Colors.red,
+                                    onPressed: () {
+                                      _deleteClothes(wardrobe.id);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
+                  // Use FutureBuilder for outfit list
+                  FutureBuilder<List<Outfit>>(
+                    future: _fetchOutfits(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else {
+                        _outfits = snapshot.data ?? [];
+                        return ListView.builder(
+                          itemCount: _outfits.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final outfit = _outfits[index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: Color.fromARGB(255, 69, 39, 160),
+                                ListTile(
+                                  title: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Outfit ${outfit.id.toString()}'),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors.redAccent),
+                                        hoverColor: Colors.transparent,
+                                        onPressed: () {
+                                          _deleteOutfit(outfit.id);
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  onPressed: () {
-                                    _handleEdit(wardrobe);
-                                  },
                                 ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.redAccent,
-                                  ),
-                                  onPressed: () {
-                                    _deleteClothes(wardrobe.id);
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: outfit.wardrobeItems.length,
+                                  itemBuilder: (BuildContext context,
+                                      int wardrobeIndex) {
+                                    final wardrobeItem =
+                                        outfit.wardrobeItems[wardrobeIndex];
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      margin: const EdgeInsets.all(8.0),
+                                      child: ListTile(
+                                        title: Text(wardrobeItem.name),
+                                        subtitle:
+                                            Text(wardrobeItem.typeClothes),
+                                      ),
+                                    );
                                   },
                                 ),
                               ],
-                            ),
-                          ),
+                            );
+                          },
                         );
-                      },
-                    ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _outfits.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final outfit = _outfits[index];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListTile(
-                        title: Text(outfit.id.toString()),
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: outfit.wardrobeItems.length,
-                        itemBuilder: (BuildContext context, int wardrobeIndex) {
-                          final wardrobeItem =
-                              outfit.wardrobeItems[wardrobeIndex];
-                          return Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            margin: const EdgeInsets.all(8.0),
-                            child: ListTile(
-                              title: Text(wardrobeItem.name),
-                              subtitle: Text(wardrobeItem.typeClothes),
-                            ),
-                          );
-                        },
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.delete, color: Colors.redAccent),
-                            onPressed: () {
-                              _deleteOutfit(outfit.id);
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
             Padding(
@@ -308,7 +342,7 @@ class _WardrobePageState extends State<WardrobePage> {
                       },
                     );
                   },
-                  child: const Icon(
+                  child: Icon(
                     Icons.add,
                     size: 32.0,
                   ),
