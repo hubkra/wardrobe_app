@@ -47,6 +47,7 @@ class _WardrobePageState extends State<WardrobePage> {
   Future<List<Outfit>> _fetchOutfits() async {
     try {
       final outfits = await _outfitService.fetchOutfits();
+      print('dziala fetch');
       return outfits;
     } catch (error) {
       // Handle error
@@ -59,6 +60,7 @@ class _WardrobePageState extends State<WardrobePage> {
       try {
         await _outfitService.deleteOutfit(id);
         setState(() {
+          print('dziala usun');
           _outfits.removeWhere((outfit) => outfit.id == id);
         });
       } catch (error) {
@@ -114,6 +116,7 @@ class _WardrobePageState extends State<WardrobePage> {
     try {
       final newOutfit = await _outfitService.createOutfit(wardrobeItems);
       setState(() {
+        print('dziala add');
         _outfits.add(newOutfit);
       });
     } catch (error) {
@@ -563,6 +566,7 @@ class _AddOutfitFormState extends State<AddOutfitForm> {
           ElevatedButton(
             onPressed: () {
               _createOutfitOnServer();
+              widget.onCreateOutfit(selectedItems);
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
