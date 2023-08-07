@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wardrobe_app/models/outfit.dart';
 
 import '../models/wardrobe.dart';
 import '../services/outfit-service.dart';
 import '../services/wardrobe_service.dart';
-import '../shared/enums/size_information.dart';
-import '../shared/enums/size_information_extension.dart';
+import 'clothes/add_clothes_form.dart';
+import 'clothes/edit_clothes_form.dart';
+import 'outfit/add_outfit_form.dart';
 
 class WardrobePage extends StatefulWidget {
   const WardrobePage({Key? key}) : super(key: key);
@@ -49,7 +49,6 @@ class _WardrobePageState extends State<WardrobePage> {
       final outfits = await _outfitService.fetchOutfits();
       return outfits;
     } catch (error) {
-      // Handle error
       return [];
     }
   }
@@ -336,14 +335,14 @@ class _WardrobePageState extends State<WardrobePage> {
                       },
                     );
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.add,
                     size: 32.0,
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 16.0,
             ),
             Padding(
@@ -376,314 +375,6 @@ class _WardrobePageState extends State<WardrobePage> {
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AddClothesForm extends StatefulWidget {
-  final Function(Wardrobe) onAddClothes;
-
-  const AddClothesForm({required this.onAddClothes});
-
-  @override
-  _AddClothesFormState createState() => _AddClothesFormState();
-}
-
-class _AddClothesFormState extends State<AddClothesForm> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _typeController = TextEditingController();
-  final _imageUrlController = TextEditingController();
-  SizeInformation _selectedSize = SizeInformation.XL; // Default selected size
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _typeController.dispose();
-    _imageUrlController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Add Clothes',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter the name';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _typeController,
-              decoration: const InputDecoration(labelText: 'Type of Clothes'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter the type of clothes';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _imageUrlController,
-              decoration: const InputDecoration(labelText: 'Image URL'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter the image URL';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            ToggleButtons(
-              isSelected: List.generate(SizeInformation.values.length, (index) {
-                return SizeInformation.values[index] == _selectedSize;
-              }),
-              onPressed: (int index) {
-                setState(() {
-                  _selectedSize = SizeInformation.values[index];
-                });
-              },
-              children: SizeInformation.values
-                  .map((size) => Text(size.toString().split('.').last))
-                  .toList(),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  final newClothes = Wardrobe(
-                    name: _nameController.text,
-                    typeClothes: _typeController.text,
-                    imageUrl: _imageUrlController.text,
-                    size: _selectedSize.toString(),
-                  );
-                  widget.onAddClothes(newClothes);
-                  Navigator.of(context).pop();
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple.shade800,
-              ),
-              child: const Text('Add'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AddOutfitForm extends StatefulWidget {
-  final List<Wardrobe> wardrobeItems;
-  final Function(List<Wardrobe>) onCreateOutfit;
-
-  const AddOutfitForm({
-    required this.wardrobeItems,
-    required this.onCreateOutfit,
-  });
-
-  @override
-  _AddOutfitFormState createState() => _AddOutfitFormState();
-}
-
-class _AddOutfitFormState extends State<AddOutfitForm> {
-  List<Wardrobe> selectedItems = [];
-  final OutfitService _outfitService = OutfitService();
-
-  Future<void> _createOutfitOnServer() async {
-    try {
-      final newOutfit = await _outfitService.createOutfit(selectedItems);
-    } catch (error) {
-      // Handle error
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Dodaj Stroj',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.wardrobeItems.length,
-              itemBuilder: (BuildContext context, int index) {
-                final wardrobeItem = widget.wardrobeItems[index];
-                final isSelected = selectedItems.contains(wardrobeItem);
-
-                return ListTile(
-                  leading: Checkbox(
-                    value: isSelected,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        if (value != null && value) {
-                          selectedItems.add(wardrobeItem);
-                        } else {
-                          selectedItems.remove(wardrobeItem);
-                        }
-                      });
-                    },
-                  ),
-                  title: Text(wardrobeItem.name),
-                  subtitle: Text(wardrobeItem.typeClothes),
-                );
-              },
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              widget.onCreateOutfit(selectedItems);
-              Navigator.of(context).pop();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple.shade800,
-            ),
-            child: const Text('Dodaj Stroj'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class EditClothesForm extends StatefulWidget {
-  final Wardrobe wardrobe;
-  final Function(Wardrobe) onEditClothes;
-
-  const EditClothesForm({
-    super.key,
-    required this.wardrobe,
-    required this.onEditClothes,
-  });
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _EditClothesFormState createState() => _EditClothesFormState();
-}
-
-class _EditClothesFormState extends State<EditClothesForm> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _typeController = TextEditingController();
-  final _imageUrlController = TextEditingController();
-  SizeInformation _selectedSize = SizeInformation.XL;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController.text = widget.wardrobe.name;
-    _typeController.text = widget.wardrobe.typeClothes;
-    _imageUrlController.text = widget.wardrobe.imageUrl;
-    _selectedSize = SizeInformationExtension.fromString(widget.wardrobe.size);
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _typeController.dispose();
-    _imageUrlController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Edit Clothes',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter the name';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _typeController,
-              decoration: const InputDecoration(labelText: 'Type of Clothes'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter the type of clothes';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _imageUrlController,
-              decoration: const InputDecoration(labelText: 'Image URL'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter the image URL';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            ToggleButtons(
-              isSelected: List.generate(SizeInformation.values.length, (index) {
-                return SizeInformation.values[index] == _selectedSize;
-              }),
-              onPressed: (int index) {
-                setState(() {
-                  _selectedSize = SizeInformation.values[index];
-                });
-              },
-              children: SizeInformation.values
-                  .map((size) => Text(size.toString().split('.').last))
-                  .toList(),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  final editedClothes = Wardrobe(
-                    id: widget.wardrobe.id,
-                    name: _nameController.text,
-                    typeClothes: _typeController.text,
-                    imageUrl: _imageUrlController.text,
-                    size: _selectedSize.toString(),
-                  );
-                  widget.onEditClothes(editedClothes);
-                  Navigator.of(context).pop();
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple.shade800,
-              ),
-              child: const Text('Save'),
             ),
           ],
         ),
