@@ -47,7 +47,6 @@ class _WardrobePageState extends State<WardrobePage> {
   Future<List<Outfit>> _fetchOutfits() async {
     try {
       final outfits = await _outfitService.fetchOutfits();
-      print('dziala fetch');
       return outfits;
     } catch (error) {
       // Handle error
@@ -55,13 +54,12 @@ class _WardrobePageState extends State<WardrobePage> {
     }
   }
 
-  Future<void> _deleteOutfit(int? id) async {
+  Future<void> _deleteOutfit(int? id, int index) async {
     if (id != null) {
       try {
         await _outfitService.deleteOutfit(id);
         setState(() {
-          print('dziala usun');
-          _outfits.removeWhere((outfit) => outfit.id == id);
+          _outfits.removeAt(index);
         });
       } catch (error) {
         print("Error deleting outfit: $error");
@@ -116,7 +114,6 @@ class _WardrobePageState extends State<WardrobePage> {
     try {
       final newOutfit = await _outfitService.createOutfit(wardrobeItems);
       setState(() {
-        print('dziala add');
         _outfits.add(newOutfit);
       });
     } catch (error) {
@@ -134,12 +131,6 @@ class _WardrobePageState extends State<WardrobePage> {
         );
       },
     );
-  }
-
-  void _handleTabChange(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   void _filterWardrobes(String query) {
@@ -291,7 +282,7 @@ class _WardrobePageState extends State<WardrobePage> {
                                             color: Colors.redAccent),
                                         hoverColor: Colors.transparent,
                                         onPressed: () {
-                                          _deleteOutfit(outfit.id);
+                                          _deleteOutfit(outfit.id, index);
                                         },
                                       ),
                                     ],
@@ -520,7 +511,6 @@ class _AddOutfitFormState extends State<AddOutfitForm> {
   Future<void> _createOutfitOnServer() async {
     try {
       final newOutfit = await _outfitService.createOutfit(selectedItems);
-      // Handle success, show a message, etc.
     } catch (error) {
       // Handle error
     }
@@ -565,7 +555,6 @@ class _AddOutfitFormState extends State<AddOutfitForm> {
           ),
           ElevatedButton(
             onPressed: () {
-              _createOutfitOnServer();
               widget.onCreateOutfit(selectedItems);
               Navigator.of(context).pop();
             },
