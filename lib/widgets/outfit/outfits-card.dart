@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../models/outfit.dart';
-import '../models/wardrobe.dart';
-import '../services/outfit-service.dart';
+import '../../models/outfit.dart';
+import '../../models/wardrobe.dart';
+import '../../services/outfit-service.dart';
 
 class OutfitsCard extends StatefulWidget {
   final int outfitId;
@@ -35,7 +35,10 @@ class _OutfitsCardState extends State<OutfitsCard> {
           );
         } else if (snapshot.hasError || !snapshot.hasData) {
           return const Center(
-            child: Text('Error: Unable to fetch outfit.'),
+            child: Text(
+              'Nie udało się pobrać Outfitów, dodaj outfity w zakładce szafy',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           );
         } else {
           final Outfit outfit = snapshot.data!;
@@ -51,7 +54,6 @@ class _OutfitsCardState extends State<OutfitsCard> {
                   ),
                   const SizedBox(height: 8),
                   Expanded(
-                    // Wrap Expanded around GridView.builder
                     child: GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(

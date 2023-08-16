@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/wardrobe.dart';
+import '../../models/wardrobe.dart';
 
 class OutfitContainer extends StatefulWidget {
   @override

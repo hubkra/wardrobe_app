@@ -12,7 +12,6 @@ class WardrobePage extends StatefulWidget {
   const WardrobePage({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _WardrobePageState createState() => _WardrobePageState();
 }
 
@@ -61,7 +60,6 @@ class _WardrobePageState extends State<WardrobePage> {
           _outfits.removeAt(index);
         });
       } catch (error) {
-        print("Error deleting outfit: $error");
         // Handle error
       }
     }
@@ -184,9 +182,9 @@ class _WardrobePageState extends State<WardrobePage> {
                         _currentIndex = 0; // Show clothes view
                       });
                     },
-                    child: Text('Clothes'),
+                    child: const Text('Clothes'),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple.shade800,
@@ -196,7 +194,7 @@ class _WardrobePageState extends State<WardrobePage> {
                         _currentIndex = 1; // Show outfits view
                       });
                     },
-                    child: Text('Outfits'),
+                    child: const Text('Outfits'),
                   ),
                 ],
               ),
@@ -205,12 +203,11 @@ class _WardrobePageState extends State<WardrobePage> {
               child: IndexedStack(
                 index: _currentIndex,
                 children: [
-                  // Use FutureBuilder for wardrobe list
                   FutureBuilder<List<Wardrobe>>(
                     future: _fetchClothes(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       } else {
@@ -253,12 +250,11 @@ class _WardrobePageState extends State<WardrobePage> {
                       }
                     },
                   ),
-                  // Use FutureBuilder for outfit list
                   FutureBuilder<List<Outfit>>(
                     future: _fetchOutfits(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       } else {

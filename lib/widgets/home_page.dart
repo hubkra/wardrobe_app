@@ -5,7 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:wardrobe_app/widgets/profile_page.dart';
 import 'package:wardrobe_app/widgets/settings_page.dart';
 import '../models/wardrobe.dart';
-import 'outfits-card.dart';
+import 'outfit/outfits-card.dart';
 import 'wardrobe_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -102,57 +102,6 @@ class HomePageContent extends StatefulWidget {
 }
 
 class _HomePageContentState extends State<HomePageContent> {
-  List<Wardrobe> _outfitItems = [];
-
-  void _addToOutfit(Wardrobe wardrobe) {
-    setState(() {
-      _outfitItems.add(wardrobe);
-    });
-  }
-
-  Widget _buildOutfitContainer() {
-    if (_outfitItems.isEmpty) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Dodaj outfit',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Przejdź do formularza lub innego sposobu dodawania outfitu
-              // Możesz tutaj użyć funkcji Navigator.push do nawigacji do nowego widoku
-            },
-            child: Icon(Icons.add),
-          ),
-        ],
-      );
-    } else {
-      return Container(
-        height: 200,
-        width: double.infinity,
-        color: Colors.grey[200],
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: _outfitItems.length,
-          itemBuilder: (context, index) {
-            // Wyświetl elementy outfitu
-            return Container(
-              width: 100,
-              child: Column(
-                children: [
-                  Text(_outfitItems[index].name),
-                  // Wyświetl pozostałe elementy outfitu
-                ],
-              ),
-            );
-          },
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Center(

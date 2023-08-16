@@ -1,14 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../../models/wardrobe.dart';
-import '../../services/outfit-service.dart';
 
 class AddOutfitForm extends StatefulWidget {
   final List<Wardrobe> wardrobeItems;
   final Function(List<Wardrobe>) onCreateOutfit;
 
   const AddOutfitForm({
+    super.key,
     required this.wardrobeItems,
     required this.onCreateOutfit,
   });
@@ -19,15 +18,6 @@ class AddOutfitForm extends StatefulWidget {
 
 class _AddOutfitFormState extends State<AddOutfitForm> {
   List<Wardrobe> selectedItems = [];
-  final OutfitService _outfitService = OutfitService();
-
-  Future<void> _createOutfitOnServer() async {
-    try {
-      final newOutfit = await _outfitService.createOutfit(selectedItems);
-    } catch (error) {
-      // Handle error
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
