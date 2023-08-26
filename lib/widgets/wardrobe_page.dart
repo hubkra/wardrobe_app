@@ -17,11 +17,13 @@ class WardrobePage extends StatefulWidget {
 
 class _WardrobePageState extends State<WardrobePage> {
   late int _currentIndex;
+  GlobalKey<AnimatedListState> _listKey = GlobalKey();
   late WardrobeService _wardrobeService;
   late OutfitService _outfitService;
   List<Wardrobe> _wardrobes = [];
   List<Wardrobe> _filteredWardrobes = [];
   List<Outfit> _outfits = [];
+  List<Outfit> _filteredOutfits = [];
 
   @override
   void initState() {
@@ -29,8 +31,20 @@ class _WardrobePageState extends State<WardrobePage> {
     _currentIndex = 0;
     _wardrobeService = WardrobeService();
     _outfitService = OutfitService();
-    _fetchClothes();
-    _fetchOutfits();
+
+    _fetchClothes().then((clothes) {
+      setState(() {
+        _wardrobes = clothes;
+        _filteredWardrobes = List.from(_wardrobes);
+      });
+    });
+
+    _fetchOutfits().then((outfits) {
+      setState(() {
+        _outfits = outfits;
+        _filteredOutfits = List.from(_outfits);
+      });
+    });
   }
 
   Future<List<Wardrobe>> _fetchClothes() async {
@@ -38,7 +52,6 @@ class _WardrobePageState extends State<WardrobePage> {
       final clothes = await _wardrobeService.findClothes();
       return clothes;
     } catch (error) {
-      // Handle error
       return [];
     }
   }
@@ -58,10 +71,11 @@ class _WardrobePageState extends State<WardrobePage> {
         await _outfitService.deleteOutfit(id);
         setState(() {
           _outfits.removeAt(index);
+          _filteredOutfits.removeAt(index);
         });
-      } catch (error) {
-        // Handle error
-      }
+
+        _listKey.currentState?.setState(() {});
+      } catch (error) {}
     }
   }
 
@@ -70,10 +84,9 @@ class _WardrobePageState extends State<WardrobePage> {
       final addedClothes = await _wardrobeService.addClothes(wardrobe);
       setState(() {
         _wardrobes.add(addedClothes);
+        _filteredWardrobes.add(addedClothes);
       });
-    } catch (error) {
-      // Handle error
-    }
+    } catch (error) {}
   }
 
   Future<void> _deleteClothes(int? id) async {
@@ -84,9 +97,7 @@ class _WardrobePageState extends State<WardrobePage> {
           _wardrobes.removeWhere((wardrobe) => wardrobe.id == id);
           _filteredWardrobes.removeWhere((wardrobe) => wardrobe.id == id);
         });
-      } catch (error) {
-        // Handle error
-      }
+      } catch (error) {}
     }
   }
 
@@ -102,19 +113,18 @@ class _WardrobePageState extends State<WardrobePage> {
           _filteredWardrobes[index] = updatedClothes;
         }
       });
-    } catch (error) {
-      // Handle error
-    }
+    } catch (error) {}
   }
 
-  Future<void> _createOutfit(List<Wardrobe> wardrobeItems) async {
+  void _createOutfit(String name, List<Wardrobe> wardrobeItems) async {
     try {
-      final newOutfit = await _outfitService.createOutfit(wardrobeItems);
+      final newOutfit = await _outfitService.createOutfit(name, wardrobeItems);
       setState(() {
         _outfits.add(newOutfit);
+        _filteredOutfits.add(newOutfit);
       });
     } catch (error) {
-      // Handle error
+      // Handle the error
     }
   }
 
@@ -146,6 +156,16 @@ class _WardrobePageState extends State<WardrobePage> {
     });
   }
 
+  void _filterOutfits(String outfitName) {
+    setState(() {
+      _filteredOutfits = _outfits.where((outfit) {
+        return outfit.wardrobeItems.any((wardrobeItem) {
+          return wardrobeItem.name == outfitName;
+        });
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,7 +185,11 @@ class _WardrobePageState extends State<WardrobePage> {
                   ),
                 ),
                 onChanged: (query) {
-                  _filterWardrobes(query);
+                  if (_currentIndex == 0) {
+                    _filterWardrobes(query);
+                  } else {
+                    _filterOutfits(query);
+                  }
                 },
               ),
             ),
@@ -179,7 +203,7 @@ class _WardrobePageState extends State<WardrobePage> {
                     ),
                     onPressed: () {
                       setState(() {
-                        _currentIndex = 0; // Show clothes view
+                        _currentIndex = 0;
                       });
                     },
                     child: const Text('Clothes'),
@@ -191,7 +215,7 @@ class _WardrobePageState extends State<WardrobePage> {
                     ),
                     onPressed: () {
                       setState(() {
-                        _currentIndex = 1; // Show outfits view
+                        _currentIndex = 1;
                       });
                     },
                     child: const Text('Outfits'),
@@ -203,113 +227,81 @@ class _WardrobePageState extends State<WardrobePage> {
               child: IndexedStack(
                 index: _currentIndex,
                 children: [
-                  FutureBuilder<List<Wardrobe>>(
-                    future: _fetchClothes(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else {
-                        _wardrobes = snapshot.data ?? [];
-                        _filteredWardrobes = List.from(_wardrobes);
-                        return ListView.builder(
-                          itemCount: _filteredWardrobes.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final wardrobe = _filteredWardrobes[index];
-                            return ListTile(
-                              title: Text(wardrobe.name),
-                              subtitle: Text(wardrobe.typeClothes),
-                              leading: wardrobe.imageUrl.isNotEmpty
-                                  ? Image.network(wardrobe.imageUrl)
-                                  : Icon(Icons.checkroom),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit),
-                                    color: Colors.deepPurple.shade800,
-                                    hoverColor: Colors.transparent,
-                                    onPressed: () {
-                                      _handleEdit(wardrobe);
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete),
-                                    hoverColor: Colors.transparent,
-                                    color: Colors.red,
-                                    onPressed: () {
-                                      _deleteClothes(wardrobe.id);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      }
+                  ListView.builder(
+                    itemCount: _filteredWardrobes.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final wardrobe = _filteredWardrobes[index];
+                      return ListTile(
+                        title: Text(wardrobe.name),
+                        subtitle: Text(wardrobe.typeClothes),
+                        leading: wardrobe.imageUrl.isNotEmpty
+                            ? Image.network(wardrobe.imageUrl)
+                            : Icon(Icons.checkroom),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              color: Colors.deepPurple.shade800,
+                              hoverColor: Colors.transparent,
+                              onPressed: () {
+                                _handleEdit(wardrobe);
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              hoverColor: Colors.transparent,
+                              color: Colors.red,
+                              onPressed: () {
+                                _deleteClothes(wardrobe.id);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
-                  FutureBuilder<List<Outfit>>(
-                    future: _fetchOutfits(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else {
-                        _outfits = snapshot.data ?? [];
-                        return ListView.builder(
-                          itemCount: _outfits.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final outfit = _outfits[index];
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                  ListView.builder(
+                    key: _listKey,
+                    itemCount: _filteredOutfits.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final outfit = _filteredOutfits[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                ListTile(
-                                  title: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('Outfit ${outfit.id.toString()}'),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete,
-                                            color: Colors.redAccent),
-                                        hoverColor: Colors.transparent,
-                                        onPressed: () {
-                                          _deleteOutfit(outfit.id, index);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: outfit.wardrobeItems.length,
-                                  itemBuilder: (BuildContext context,
-                                      int wardrobeIndex) {
-                                    final wardrobeItem =
-                                        outfit.wardrobeItems[wardrobeIndex];
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                      margin: const EdgeInsets.all(8.0),
-                                      child: ListTile(
-                                        title: Text(wardrobeItem.name),
-                                        subtitle:
-                                            Text(wardrobeItem.typeClothes),
-                                      ),
-                                    );
+                                Text('Outfit: ${outfit.name.toString()}'),
+                                IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.redAccent),
+                                  hoverColor: Colors.transparent,
+                                  onPressed: () {
+                                    _deleteOutfit(outfit.id, index);
                                   },
                                 ),
                               ],
-                            );
-                          },
-                        );
-                      }
+                            ),
+                          ),
+                          Column(
+                            children: outfit.wardrobeItems.map((wardrobeItem) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                margin: const EdgeInsets.all(8.0),
+                                child: ListTile(
+                                  title: Text(wardrobeItem.name),
+                                  subtitle: Text(wardrobeItem.typeClothes),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      );
                     },
                   ),
                 ],

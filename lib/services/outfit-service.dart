@@ -20,9 +20,10 @@ class OutfitService {
     }
   }
 
-  Future<Outfit> createOutfit(List<Wardrobe> wardrobeItems) async {
+  Future<Outfit> createOutfit(String name, List<Wardrobe> wardrobeItems) async {
     final Map<String, dynamic> requestBody = {
       'wardrobeItems': wardrobeItems.map((item) => item.toJson()).toList(),
+      'name': name
     };
 
     final response = await http.post(

@@ -49,7 +49,7 @@ class _OutfitsCardState extends State<OutfitsCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Outfit ${outfit.id}',
+                    'Outfit: ${outfit.name}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),

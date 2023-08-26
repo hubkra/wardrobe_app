@@ -4,7 +4,7 @@ import '../../models/wardrobe.dart';
 
 class AddOutfitForm extends StatefulWidget {
   final List<Wardrobe> wardrobeItems;
-  final Function(List<Wardrobe>) onCreateOutfit;
+  final Function(String, List<Wardrobe>) onCreateOutfit;
 
   const AddOutfitForm({
     super.key,
@@ -18,6 +18,7 @@ class AddOutfitForm extends StatefulWidget {
 
 class _AddOutfitFormState extends State<AddOutfitForm> {
   List<Wardrobe> selectedItems = [];
+  TextEditingController _outfitNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +30,10 @@ class _AddOutfitFormState extends State<AddOutfitForm> {
           const Text(
             'Dodaj Stroj',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          TextFormField(
+            controller: _outfitNameController,
+            decoration: InputDecoration(labelText: 'Nazwa Outfitu'),
           ),
           Expanded(
             child: ListView.builder(
@@ -58,7 +63,7 @@ class _AddOutfitFormState extends State<AddOutfitForm> {
           ),
           ElevatedButton(
             onPressed: () {
-              widget.onCreateOutfit(selectedItems);
+              widget.onCreateOutfit(_outfitNameController.text, selectedItems);
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
