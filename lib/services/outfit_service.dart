@@ -66,4 +66,20 @@ class OutfitService {
       throw Exception('Request failed with status: ${response.statusCode}.');
     }
   }
+
+  Future<Outfit> updateOutfit(int id, Outfit outfit) async {
+    final response = await http.put(
+      Uri.parse('http://localhost:8080/api/outfits/$id'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(outfit.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> json = jsonDecode(response.body);
+      final Outfit updatedOutfit = Outfit.fromJson(json);
+      return updatedOutfit;
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}.');
+    }
+  }
 }

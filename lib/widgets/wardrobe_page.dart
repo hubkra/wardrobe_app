@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:wardrobe_app/models/outfit.dart';
 
 import '../models/wardrobe.dart';
-import '../services/outfit-service.dart';
+import '../services/outfit_service.dart';
 import '../services/wardrobe_service.dart';
 import 'clothes/add_clothes_form.dart';
 import 'clothes/edit_clothes_form.dart';
 import 'outfit/add_outfit_form.dart';
+import 'outfit/edit_outfit_form.dart';
 
 class WardrobePage extends StatefulWidget {
   const WardrobePage({Key? key}) : super(key: key);
@@ -15,22 +16,24 @@ class WardrobePage extends StatefulWidget {
   _WardrobePageState createState() => _WardrobePageState();
 }
 
-class _WardrobePageState extends State<WardrobePage> {
+class _WardrobePageState extends State<WardrobePage>
+    with TickerProviderStateMixin {
   late int _currentIndex;
-  GlobalKey<AnimatedListState> _listKey = GlobalKey();
+  late TabController _tabController;
   late WardrobeService _wardrobeService;
   late OutfitService _outfitService;
   List<Wardrobe> _wardrobes = [];
   List<Wardrobe> _filteredWardrobes = [];
   List<Outfit> _outfits = [];
   List<Outfit> _filteredOutfits = [];
+  final GlobalKey<AnimatedListState> _outfitsListKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = 0;
     _wardrobeService = WardrobeService();
     _outfitService = OutfitService();
+    _tabController = TabController(length: 2, vsync: this);
 
     _fetchClothes().then((clothes) {
       setState(() {
@@ -73,8 +76,6 @@ class _WardrobePageState extends State<WardrobePage> {
           _outfits.removeAt(index);
           _filteredOutfits.removeAt(index);
         });
-
-        _listKey.currentState?.setState(() {});
       } catch (error) {}
     }
   }
@@ -116,7 +117,7 @@ class _WardrobePageState extends State<WardrobePage> {
     } catch (error) {}
   }
 
-  void _createOutfit(String name, List<Wardrobe> wardrobeItems) async {
+  Future<void> _createOutfit(String name, List<Wardrobe> wardrobeItems) async {
     try {
       final newOutfit = await _outfitService.createOutfit(name, wardrobeItems);
       setState(() {
@@ -156,14 +157,53 @@ class _WardrobePageState extends State<WardrobePage> {
     });
   }
 
-  void _filterOutfits(String outfitName) {
+  void _filterOutfits(String query) {
     setState(() {
-      _filteredOutfits = _outfits.where((outfit) {
-        return outfit.wardrobeItems.any((wardrobeItem) {
-          return wardrobeItem.name == outfitName;
-        });
-      }).toList();
+      if (query.isEmpty) {
+        _filteredOutfits = List.from(_outfits);
+      } else {
+        _filteredOutfits = _outfits.where((outfit) {
+          return outfit.name?.toLowerCase().contains(query.toLowerCase()) ??
+              false;
+        }).toList();
+      }
     });
+  }
+
+  void _handleEditOutfit(Outfit outfit) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return EditOutfitForm(
+          outfit: outfit,
+          wardrobeItems: _wardrobes,
+          onUpdateOutfit: (String name, List<Wardrobe> wardrobeItems) async {
+            try {
+              final updatedOutfit = await _outfitService.updateOutfit(
+                outfit.id,
+                Outfit(
+                  id: outfit.id,
+                  name: name,
+                  wardrobeItems: wardrobeItems,
+                ),
+              );
+              // Find the index of the updated outfit in _outfits and _filteredOutfits
+              final index =
+                  _outfits.indexWhere((o) => o.id == updatedOutfit.id);
+              if (index != -1) {
+                setState(() {
+                  _outfits[index] = updatedOutfit;
+                  _filteredOutfits[index] = updatedOutfit;
+                });
+              }
+              Navigator.of(context).pop();
+            } catch (error) {
+              // Handle the error if the update fails
+            }
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -185,7 +225,7 @@ class _WardrobePageState extends State<WardrobePage> {
                   ),
                 ),
                 onChanged: (query) {
-                  if (_currentIndex == 0) {
+                  if (_tabController.index == 0) {
                     _filterWardrobes(query);
                   } else {
                     _filterOutfits(query);
@@ -195,37 +235,23 @@ class _WardrobePageState extends State<WardrobePage> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
+              child: Column(
                 children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple.shade800,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _currentIndex = 0;
-                      });
-                    },
-                    child: const Text('Clothes'),
+                  TabBar(
+                    controller: _tabController,
+                    labelColor: Colors.deepPurple.shade800,
+                    tabs: const [
+                      Tab(text: 'Clothes'),
+                      Tab(text: 'Outfits'),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple.shade800,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _currentIndex = 1;
-                      });
-                    },
-                    child: const Text('Outfits'),
-                  ),
+                  const SizedBox(height: 16.0),
                 ],
               ),
             ),
             Expanded(
-              child: IndexedStack(
-                index: _currentIndex,
+              child: TabBarView(
+                controller: _tabController,
                 children: [
                   ListView.builder(
                     itemCount: _filteredWardrobes.length,
@@ -261,49 +287,61 @@ class _WardrobePageState extends State<WardrobePage> {
                       );
                     },
                   ),
-                  ListView.builder(
-                    key: _listKey,
-                    itemCount: _filteredOutfits.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final outfit = _filteredOutfits[index];
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Outfit: ${outfit.name.toString()}'),
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.redAccent),
-                                  hoverColor: Colors.transparent,
-                                  onPressed: () {
-                                    _deleteOutfit(outfit.id, index);
-                                  },
-                                ),
-                              ],
+                  Builder(builder: (BuildContext context) {
+                    return ListView.builder(
+                      key: _outfitsListKey,
+                      itemCount: _filteredOutfits.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final outfit = _filteredOutfits[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              key: ValueKey(outfit.id),
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Outfit: ${outfit.name.toString()}'),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.redAccent),
+                                    hoverColor: Colors.transparent,
+                                    onPressed: () {
+                                      _deleteOutfit(outfit.id, index);
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    color: Colors.blue,
+                                    onPressed: () {
+                                      _handleEditOutfit(outfit);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          Column(
-                            children: outfit.wardrobeItems.map((wardrobeItem) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                margin: const EdgeInsets.all(8.0),
-                                child: ListTile(
-                                  title: Text(wardrobeItem.name),
-                                  subtitle: Text(wardrobeItem.typeClothes),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                            Column(
+                              children:
+                                  outfit.wardrobeItems.map((wardrobeItem) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  margin: const EdgeInsets.all(8.0),
+                                  child: ListTile(
+                                    title: Text(wardrobeItem.name),
+                                    subtitle: Text(wardrobeItem.typeClothes),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }),
                 ],
               ),
             ),
