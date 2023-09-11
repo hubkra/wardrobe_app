@@ -5,11 +5,13 @@ import 'package:wardrobe_app/models/wardrobe.dart';
 class EditOutfitForm extends StatefulWidget {
   final Outfit outfit;
   final List<Wardrobe> wardrobeItems;
+  final List<Wardrobe> selectedWardrobeItems;
   final Function(String, List<Wardrobe>) onUpdateOutfit;
 
   EditOutfitForm({
     required this.outfit,
     required this.wardrobeItems,
+    required this.selectedWardrobeItems,
     required this.onUpdateOutfit,
   });
 
@@ -19,19 +21,13 @@ class EditOutfitForm extends StatefulWidget {
 
 class _EditOutfitFormState extends State<EditOutfitForm> {
   List<Wardrobe> selectedItems = [];
-  TextEditingController _outfitNameController = TextEditingController();
+  final TextEditingController _outfitNameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _outfitNameController.text = widget.outfit.name ?? '';
-    selectedItems.addAll(widget.outfit.wardrobeItems);
-  }
-
-  @override
-  void dispose() {
-    _outfitNameController.dispose();
-    super.dispose();
+    selectedItems = List.from(widget.selectedWardrobeItems);
   }
 
   @override
@@ -47,7 +43,7 @@ class _EditOutfitFormState extends State<EditOutfitForm> {
           ),
           TextFormField(
             controller: _outfitNameController,
-            decoration: InputDecoration(labelText: 'Outfit Name'),
+            decoration: const InputDecoration(labelText: 'Outfit Name'),
           ),
           Expanded(
             child: ListView.builder(
@@ -79,16 +75,13 @@ class _EditOutfitFormState extends State<EditOutfitForm> {
           ),
           ElevatedButton(
             onPressed: () {
-              widget.onUpdateOutfit(
-                _outfitNameController.text,
-                selectedItems,
-              );
+              widget.onUpdateOutfit(_outfitNameController.text, selectedItems);
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple.shade800,
             ),
-            child: const Text('Save Changes'),
+            child: const Text('Update Outfit'),
           ),
         ],
       ),

@@ -18,7 +18,6 @@ class WardrobePage extends StatefulWidget {
 
 class _WardrobePageState extends State<WardrobePage>
     with TickerProviderStateMixin {
-  late int _currentIndex;
   late TabController _tabController;
   late WardrobeService _wardrobeService;
   late OutfitService _outfitService;
@@ -71,12 +70,16 @@ class _WardrobePageState extends State<WardrobePage>
   Future<void> _deleteOutfit(int? id, int index) async {
     if (id != null) {
       try {
+        print('called before. setstate');
         await _outfitService.deleteOutfit(id);
         setState(() {
           _outfits.removeAt(index);
           _filteredOutfits.removeAt(index);
+          print('setState was called successfully.');
         });
-      } catch (error) {}
+      } catch (error) {
+        print(error);
+      }
     }
   }
 
@@ -177,6 +180,7 @@ class _WardrobePageState extends State<WardrobePage>
         return EditOutfitForm(
           outfit: outfit,
           wardrobeItems: _wardrobes,
+          selectedWardrobeItems: outfit.wardrobeItems,
           onUpdateOutfit: (String name, List<Wardrobe> wardrobeItems) async {
             try {
               final updatedOutfit = await _outfitService.updateOutfit(
@@ -187,7 +191,7 @@ class _WardrobePageState extends State<WardrobePage>
                   wardrobeItems: wardrobeItems,
                 ),
               );
-              // Find the index of the updated outfit in _outfits and _filteredOutfits
+
               final index =
                   _outfits.indexWhere((o) => o.id == updatedOutfit.id);
               if (index != -1) {
@@ -196,7 +200,6 @@ class _WardrobePageState extends State<WardrobePage>
                   _filteredOutfits[index] = updatedOutfit;
                 });
               }
-              Navigator.of(context).pop();
             } catch (error) {
               // Handle the error if the update fails
             }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/outfit.dart';
 import '../../models/wardrobe.dart';
-import '../../services/outfit-service.dart';
+import '../../services/outfit_service.dart';
 
 class OutfitsCard extends StatefulWidget {
   final int outfitId;

@@ -6,7 +6,7 @@ import 'package:wardrobe_app/widgets/registration_page.dart';
 
 import '../models/outfit.dart';
 import '../models/user.dart';
-import '../services/outfit-service.dart';
+import '../services/outfit_service.dart';
 import '../services/registration_login_service.dart';
 import 'home_page.dart';
 
@@ -24,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final OutfitService _outfitService = OutfitService();
   List<Outfit> _outfits = [];
 
+  @override
   void initState() {
     super.initState();
     _fetchOutfits();
