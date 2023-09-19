@@ -241,8 +241,13 @@ class _WardrobePageState extends State<WardrobePage>
               child: Column(
                 children: [
                   TabBar(
+                    unselectedLabelColor: Colors.black,
+                    indicator: BoxDecoration(
+                      color: Colors.deepPurple.shade800,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
                     controller: _tabController,
-                    labelColor: Colors.deepPurple.shade800,
+                    labelColor: Colors.white,
                     tabs: const [
                       Tab(text: 'Clothes'),
                       Tab(text: 'Outfits'),
@@ -265,12 +270,12 @@ class _WardrobePageState extends State<WardrobePage>
                         subtitle: Text(wardrobe.typeClothes),
                         leading: wardrobe.imageUrl.isNotEmpty
                             ? Image.network(wardrobe.imageUrl)
-                            : Icon(Icons.checkroom),
+                            : const Icon(Icons.checkroom),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.edit),
+                              icon: const Icon(Icons.edit),
                               color: Colors.deepPurple.shade800,
                               hoverColor: Colors.transparent,
                               onPressed: () {
@@ -278,7 +283,7 @@ class _WardrobePageState extends State<WardrobePage>
                               },
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete),
+                              icon: const Icon(Icons.delete),
                               hoverColor: Colors.transparent,
                               color: Colors.red,
                               onPressed: () {
@@ -315,8 +320,8 @@ class _WardrobePageState extends State<WardrobePage>
                                     },
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.edit),
-                                    color: Colors.blue,
+                                    icon: const Icon(Icons.edit),
+                                    color: Colors.deepPurple.shade800,
                                     onPressed: () {
                                       _handleEditOutfit(outfit);
                                     },

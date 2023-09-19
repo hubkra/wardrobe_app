@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:wardrobe_app/widgets/profile_page.dart';
-import 'package:wardrobe_app/widgets/settings_page.dart';
 import '../models/wardrobe.dart';
 import 'outfit/outfits-card.dart';
 import 'wardrobe_page.dart';
@@ -30,7 +29,6 @@ class _HomePageState extends State<HomePage> {
     _pages.addAll([
       HomePageContent(username: widget.username, outfitId: widget.outfitId),
       WardrobePage(),
-      SettingsPage(),
       ProfilePage(),
     ]);
   }
@@ -69,10 +67,6 @@ class _HomePageState extends State<HomePage> {
               GButton(
                 icon: Icons.settings,
                 text: 'Settings',
-              ),
-              GButton(
-                icon: Icons.sensor_occupied,
-                text: 'Profile',
               ),
             ],
             selectedIndex: _currentIndex,
