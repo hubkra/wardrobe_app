@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     _pages.addAll([
       HomePageContent(username: widget.username, outfitId: widget.outfitId),
       WardrobePage(),
-      ProfilePage(),
+      ProfilePage(username: widget.username),
     ]);
   }
 

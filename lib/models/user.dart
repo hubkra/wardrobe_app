@@ -1,21 +1,24 @@
+import 'dart:typed_data';
+
 class User {
   final String emailId;
   final String? userName;
   final String password;
+  String? profilePicture;
 
   User({
     required this.emailId,
     this.userName,
     required this.password,
+    this.profilePicture,
   });
-
-  // Add any additional methods or properties as needed
 
   Map<String, dynamic> toJson() {
     return {
       'emailId': emailId,
       'userName': userName,
       'password': password,
+      'profilePicture': profilePicture,
     };
   }
 
@@ -24,6 +27,7 @@ class User {
       emailId: json['emailId'],
       userName: json['userName'],
       password: json['password'],
+      profilePicture: json['profilePicture'],
     );
   }
 }
