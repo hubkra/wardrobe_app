@@ -56,7 +56,10 @@ class _ProfilePageState extends State<ProfilePage> {
             await userApiService.uploadProfilePicture(user, filePath);
 
         if (response == 'Zdjęcie użytkownika zostało zaktualizowane.') {
-          _fetchUser(widget.username);
+          // Zaktualizuj stan widoku po zmianie awatara
+          setState(() {
+            _userFuture = _fetchUser(widget.username);
+          });
         } else {
           print(response);
         }
@@ -73,13 +76,13 @@ class _ProfilePageState extends State<ProfilePage> {
         future: _userFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
             return Center(
               child: Text('Wystąpił błąd: ${snapshot.error}'),
             );
           } else if (!snapshot.hasData) {
-            return Center(
+            return const Center(
               child: Text('Użytkownik o podanym adresie e-mail nie istnieje'),
             );
           } else {
@@ -126,14 +129,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 100.0),
                 ListTile(
                   title: Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _selectNewAvatar();
-                      },
-                      child: const Text('Change Avatar'),
-                    ),
+                    child: buildElevatedButton('Change Avatar', () {
+                      _selectNewAvatar();
+                    }),
                   ),
-                  tileColor: Colors.purple[100],
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 8.0,
@@ -148,4 +147,27 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
+
+ElevatedButton buildElevatedButton(String text, VoidCallback onPressed) {
+  return ElevatedButton(
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.deepPurple.shade800, // Kolor tła przycisku
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 20.0,
+      ), // Padding przycisku
+      minimumSize: const Size(
+          double.infinity, 0), // Ustaw szerokość na pełną dostępną szerokość
+    ),
+    child: Text(
+      text,
+      style: const TextStyle(
+        color: Colors.white, // Kolor tekstu na przycisku
+        fontSize: 18.0,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
 }

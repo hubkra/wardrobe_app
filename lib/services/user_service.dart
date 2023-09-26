@@ -10,12 +10,11 @@ class UserApiService {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/upload'));
       request.fields['userEmailId'] = user.emailId;
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'file',
-          filePath,
-        ),
-      );
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'file',
+        filePath,
+      ));
 
       var response = await request.send();
       if (response.statusCode == 200) {
