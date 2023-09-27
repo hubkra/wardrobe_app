@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:wardrobe_app/widgets/edit_password_page.dart';
 import 'dart:typed_data';
 import 'dart:convert';
 
@@ -183,6 +184,39 @@ class _ProfilePageState extends State<ProfilePage> {
                     'Edit Profile',
                     style: TextStyle(
                       color: Colors.white, // Kolor tekstu na przycisku
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChangePasswordPage(user: user),
+                      ),
+                    ).then((result) {
+                      if (result == true) {
+                        // Odśwież profil po zapisaniu zmian
+                        setState(() {
+                          _userFuture = _fetchUser(widget.username);
+                        });
+                      }
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple.shade800,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 24.0,
+                    ),
+                  ),
+                  child: const Text(
+                    'Edit Password',
+                    style: TextStyle(
+                      color: Colors.white,
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
