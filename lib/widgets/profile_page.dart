@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import '../models/user.dart';
 import '../services/user_service.dart';
+import 'edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String username;
@@ -18,6 +19,13 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late Future<User> _userFuture;
   final UserApiService userApiService = UserApiService();
+  bool _isEditing = false;
+
+  void _toggleEdit() {
+    setState(() {
+      _isEditing = !_isEditing;
+    });
+  }
 
   @override
   void initState() {
@@ -116,9 +124,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 24.0),
-                      const Text(
-                        'Change Avatar',
-                        style: TextStyle(
+                      Text(
+                        user.userName!,
+                        style: const TextStyle(
                           fontSize: 40.0,
                           fontWeight: FontWeight.bold,
                         ),
@@ -127,18 +135,60 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 100.0),
-                ListTile(
-                  title: Center(
-                    child: buildElevatedButton('Change Avatar', () {
-                      _selectNewAvatar();
-                    }),
+                ElevatedButton(
+                  onPressed: () {
+                    _selectNewAvatar();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple.shade800,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 24.0,
+                    ),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
+                  child: const Text(
+                    'Change Avatar',
+                    style: TextStyle(
+                      color: Colors.white, // Kolor tekstu na przycisku
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  onTap: () {},
                 ),
+                const SizedBox(height: 10.0),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfilePage(user: user),
+                      ),
+                    ).then((result) {
+                      if (result == true) {
+                        // Odśwież profil po zapisaniu zmian
+                        setState(() {
+                          _userFuture = _fetchUser(widget.username);
+                        });
+                      }
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple.shade800,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 24.0,
+                    ),
+                  ),
+                  child: const Text(
+                    'Edit Profile',
+                    style: TextStyle(
+                      color: Colors.white, // Kolor tekstu na przycisku
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+
                 // Reszta widoku
               ],
             );
@@ -147,27 +197,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-}
-
-ElevatedButton buildElevatedButton(String text, VoidCallback onPressed) {
-  return ElevatedButton(
-    onPressed: onPressed,
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.deepPurple.shade800, // Kolor tła przycisku
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 20.0,
-      ), // Padding przycisku
-      minimumSize: const Size(
-          double.infinity, 0), // Ustaw szerokość na pełną dostępną szerokość
-    ),
-    child: Text(
-      text,
-      style: const TextStyle(
-        color: Colors.white, // Kolor tekstu na przycisku
-        fontSize: 18.0,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  );
 }
