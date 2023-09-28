@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../models/user.dart';
 import '../services/user_service.dart';
 import 'edit_profile_page.dart';
+import 'login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String username;
@@ -26,6 +27,14 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _isEditing = !_isEditing;
     });
+  }
+
+  void _logoutUser() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+      (route) => false,
+    );
   }
 
   @override
@@ -222,7 +231,27 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
-
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () {
+                    _logoutUser();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 199, 0, 0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 24.0,
+                    ),
+                  ),
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 // Reszta widoku
               ],
             );
