@@ -120,9 +120,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   userProvider.getUser()?.profilePicture,
                             );
 
-                            // Update user data in the provider
-                            userProvider.setUser(updatedUser);
-
                             // Save the updated user data via the API
                             userApiService
                                 .updateUser(
@@ -130,14 +127,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               oldEmailId: userProvider.getUser()?.emailId,
                             )
                                 .then((response) {
-                              if (response ==
-                                  'Dane użytkownika zostały zaktualizowane.') {
+                              if (response.isNotEmpty) {
+                                userProvider.setUser(updatedUser);
                                 Navigator.pop(context, true);
                               } else {
                                 // Handle response as needed
                               }
                             }).catchError((error) {
-                              // Handle error as needed
                               print(
                                   'Błąd podczas aktualizacji danych użytkownika: $error');
                             });

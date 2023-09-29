@@ -15,24 +15,18 @@ class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
   late Future<User> _userFuture;
   final UserApiService userApiService = UserApiService();
-  bool _isEditing = false;
-
-  void _toggleEdit() {
-    setState(() {
-      _isEditing = !_isEditing;
-    });
-  }
 
   void _logoutUser() {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
       (route) => false,
     );
   }
@@ -42,6 +36,21 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     _userFuture = _fetchUser(userProvider.getUser()?.emailId);
+
+    userProvider.addListener(_onEmailIdChange);
+  }
+
+  @override
+  void dispose() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.removeListener(_onEmailIdChange);
+    super.dispose();
+  }
+
+  void _onEmailIdChange() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    _userFuture = _fetchUser(userProvider.getUser()?.emailId);
+    setState(() {});
   }
 
   Uint8List decodeImageString(String imageString) {
@@ -173,20 +182,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 10.0),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => EditProfilePage(),
                       ),
-                    ).then((result) {
-                      if (result == true) {
-                        // Odśwież profil po zapisaniu zmian
-                        setState(() {
-                          _userFuture = _fetchUser(user.emailId);
-                        });
-                      }
-                    });
+                    );
+
+                    if (result == true) {
+                      await Future.delayed(Duration(milliseconds: 100));
+                      final userProvider =
+                          // ignore: use_build_context_synchronously
+                          Provider.of<UserProvider>(context, listen: false);
+                      _userFuture = _fetchUser(userProvider.getUser()?.emailId);
+                      setState(() {});
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple.shade800,
@@ -258,7 +269,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
-                // Reszta widoku
+                // Rest of your code
               ],
             );
           }
