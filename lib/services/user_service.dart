@@ -29,10 +29,10 @@ class UserApiService {
     }
   }
 
-  Future<String> updateUser(User user) async {
+  Future<String> updateUser(User user, {String? oldEmailId}) async {
     try {
       var response = await http.put(
-        Uri.parse('$baseUrl/update/${user.emailId}'),
+        Uri.parse('$baseUrl/update/${oldEmailId ?? user.emailId}'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(user.toJson()),
       );

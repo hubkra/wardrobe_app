@@ -30,4 +30,9 @@ class User {
       profilePicture: json['profilePicture'],
     );
   }
+
+  @override
+  String toString() {
+    return 'User(emailId: $emailId, password: $password)';
+  }
 }

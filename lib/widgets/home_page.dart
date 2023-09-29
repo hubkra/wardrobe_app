@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:wardrobe_app/widgets/profile_page.dart';
 import '../models/wardrobe.dart';
+import '../providers/user_provider.dart';
 import 'outfit/outfits-card.dart';
 import 'wardrobe_page.dart';
 
 class HomePage extends StatefulWidget {
-  final String username;
   final int outfitId;
 
-  const HomePage({Key? key, required this.username, required this.outfitId})
-      : super(key: key);
+  const HomePage({Key? key, required this.outfitId}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -27,9 +27,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages.addAll([
-      HomePageContent(username: widget.username, outfitId: widget.outfitId),
+      HomePageContent(outfitId: widget.outfitId),
       WardrobePage(),
-      ProfilePage(username: widget.username),
+      ProfilePage(),
     ]);
   }
 
@@ -83,12 +83,9 @@ class _HomePageState extends State<HomePage> {
 }
 
 class HomePageContent extends StatefulWidget {
-  final String username;
   final int outfitId;
 
-  const HomePageContent(
-      {Key? key, required this.username, required this.outfitId})
-      : super(key: key);
+  const HomePageContent({Key? key, required this.outfitId}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -98,6 +95,9 @@ class HomePageContent extends StatefulWidget {
 class _HomePageContentState extends State<HomePageContent> {
   @override
   Widget build(BuildContext context) {
+    final username =
+        Provider.of<UserProvider>(context).getUser()?.emailId ?? "";
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +136,7 @@ class _HomePageContentState extends State<HomePageContent> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    widget.username,
+                    username,
                     style: GoogleFonts.bebasNeue(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,

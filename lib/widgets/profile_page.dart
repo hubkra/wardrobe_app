@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:wardrobe_app/widgets/edit_password_page.dart';
 import 'dart:typed_data';
 import 'dart:convert';
@@ -8,11 +9,10 @@ import '../models/user.dart';
 import '../services/user_service.dart';
 import 'edit_profile_page.dart';
 import 'login_page.dart';
+import '../providers/user_provider.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String username;
-
-  const ProfilePage({Key? key, required this.username}) : super(key: key);
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -40,7 +40,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _userFuture = _fetchUser(widget.username);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    _userFuture = _fetchUser(userProvider.getUser()?.emailId);
   }
 
   Uint8List decodeImageString(String imageString) {
@@ -48,13 +49,17 @@ class _ProfilePageState extends State<ProfilePage> {
     return Uint8List.fromList(decodedBytes);
   }
 
-  Future<User> _fetchUser(String username) async {
+  Future<User> _fetchUser(String? emailId) async {
     try {
-      User? user = await userApiService.getUser(username);
-      if (user != null) {
-        return user;
+      if (emailId != null) {
+        User? user = await userApiService.getUser(emailId);
+        if (user != null) {
+          return user;
+        } else {
+          throw Exception('Użytkownik o podanym adresie e-mail nie istnieje');
+        }
       } else {
-        throw Exception('Użytkownik o podanym adresie e-mail nie istnieje');
+        throw Exception('Brak zalogowanego użytkownika');
       }
     } catch (e) {
       throw Exception('Błąd podczas pobierania użytkownika: $e');
@@ -63,26 +68,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _selectNewAvatar() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       final filePath = pickedFile.path;
-      final user = await userApiService.getUser(widget.username);
+      // ignore: use_build_context_synchronously
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final user = userProvider.getUser();
 
       if (user != null) {
         final response =
             await userApiService.uploadProfilePicture(user, filePath);
 
         if (response == 'Zdjęcie użytkownika zostało zaktualizowane.') {
-          // Zaktualizuj stan widoku po zmianie awatara
           setState(() {
-            _userFuture = _fetchUser(widget.username);
+            _userFuture = _fetchUser(user.emailId);
           });
         } else {
           print(response);
         }
       } else {
-        print('Użytkownik o podanym adresie e-mail nie istnieje');
+        print('Brak zalogowanego użytkownika');
       }
     }
   }
@@ -171,13 +177,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EditProfilePage(user: user),
+                        builder: (context) => EditProfilePage(),
                       ),
                     ).then((result) {
                       if (result == true) {
                         // Odśwież profil po zapisaniu zmian
                         setState(() {
-                          _userFuture = _fetchUser(widget.username);
+                          _userFuture = _fetchUser(user.emailId);
                         });
                       }
                     });
@@ -210,7 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       if (result == true) {
                         // Odśwież profil po zapisaniu zmian
                         setState(() {
-                          _userFuture = _fetchUser(widget.username);
+                          _userFuture = _fetchUser(user.emailId);
                         });
                       }
                     });

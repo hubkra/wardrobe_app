@@ -2,16 +2,19 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:wardrobe_app/services/user_service.dart';
 import 'package:wardrobe_app/widgets/registration_page.dart';
 
 import '../models/outfit.dart';
 import '../models/user.dart';
+import '../providers/user_provider.dart';
 import '../services/outfit_service.dart';
 import '../services/registration_login_service.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -22,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final OutfitService _outfitService = OutfitService();
+  final UserApiService userService = UserApiService();
   List<Outfit> _outfits = [];
 
   @override
@@ -65,189 +69,181 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.grey[300],
       body: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.checkroom,
-                size: 100,
-              ),
-              const SizedBox(
-                height: 100,
-              ),
-              // Hello again!
-              Text(
-                'Hello Again!',
-                style: GoogleFonts.bebasNeue(
-                  fontSize: 52,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.checkroom,
+                  size: 100,
                 ),
-              ),
-
-              const SizedBox(height: 10),
-
-              const Text(
-                'Welcome back, you\'ve been missed!',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                const SizedBox(
+                  height: 100,
                 ),
-              ),
-              const SizedBox(height: 50),
-
-              // email textfield
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    border: Border.all(color: Colors.white),
-                    borderRadius: BorderRadius.circular(12),
+                Text(
+                  'Hello Again!',
+                  style: GoogleFonts.bebasNeue(
+                    fontSize: 52,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: TextField(
-                      controller: _emailIdController,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Email',
-                      ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Welcome back, you\'ve been missed!',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-// password textfield
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    border: Border.all(color: Colors.white),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Password',
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              // sign in button
-              SizedBox(
-                height: 60,
-                child: FractionallySizedBox(
-                  widthFactor: 0.9,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(
-                        const EdgeInsets.all(20),
-                      ),
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.deepPurple),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: TextField(
+                        controller: _emailIdController,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Email',
                         ),
                       ),
                     ),
-                    onPressed: () {
-                      // Get emailId and password from the text fields
-                      String emailId = _emailIdController.text;
-                      String password = _passwordController.text;
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Password',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 25),
+                SizedBox(
+                  height: 60,
+                  child: FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                          const EdgeInsets.all(20),
+                        ),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.deepPurple),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Get emailId and password from the text fields
+                        String emailId = _emailIdController.text;
+                        String password = _passwordController.text;
 
-                      // Create a User object with the entered data
-                      User user = User(
-                        emailId: emailId,
-                        password: password,
-                      );
-
-                      int outfitId = _getRandomOutfitId();
-
-                      // Call the loginUser method from the backendService instance
-                      backendService.loginUser(user).then((response) {
-                        // Handle the login response
-                        // You can check the response here and perform appropriate actions
-                        // For example, if the login is successful, you can navigate to the next screen
-                        // If the login fails, you can display an error message
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Login successful!')),
+                        // Create a User object with the entered data
+                        User user = User(
+                          emailId: emailId,
+                          password: password,
                         );
 
-                        // Navigate to the next screen after successful login
+                        int outfitId = _getRandomOutfitId();
+
+                        print('User to login: $user');
+
+                        backendService.loginUser(user).then((response) {
+                          final userProvider =
+                              Provider.of<UserProvider>(context, listen: false);
+
+                          userService.getUser(emailId).then((user) {
+                            userProvider.setUser(user);
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Login successful!')),
+                          );
+
+                          // Navigate to the next screen after successful login
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    HomePage(outfitId: outfitId)),
+                          );
+                        }).catchError((error) {
+                          // Handle login error
+                          String errorMessage =
+                              'Login failed. Please try again.';
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(errorMessage)),
+                          );
+                        });
+                      },
+                      child: const Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Not a member?',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => HomePage(
-                                  username: emailId, outfitId: outfitId)),
+                              builder: (context) => const RegistrationPage()),
                         );
-                      }).catchError((error) {
-                        // Handle login error
-                        String errorMessage = 'Login failed. Please try again.';
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(errorMessage)),
-                        );
-                      });
-                    },
-                    child: const Text(
-                      'Sign In',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(
-                height: 40,
-              ),
-
-              // not a member? register now
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Not a member?',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegistrationPage()),
-                      );
-                    },
-                    child: const MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Text(
-                        ' Register now',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
+                      },
+                      child: const MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: Text(
+                          ' Register now',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

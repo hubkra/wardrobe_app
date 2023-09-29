@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/user.dart';
+import '../providers/user_provider.dart';
 import '../services/user_service.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final User user;
-
-  const EditProfilePage({Key? key, required this.user}) : super(key: key);
-
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -14,17 +12,17 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _userNameController = TextEditingController();
-  TextEditingController _passwordController =
-      TextEditingController(); // Nowy kontroler dla pola hasła
+  TextEditingController _passwordController = TextEditingController();
   final UserApiService userApiService = UserApiService();
-  final GlobalKey<FormState> _formKey =
-      GlobalKey<FormState>(); // Klucz formularza
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late UserProvider userProvider;
 
   @override
   void initState() {
     super.initState();
-    _emailController.text = widget.user.emailId;
-    _userNameController.text = widget.user.userName ?? '';
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    _emailController.text = userProvider.getUser()?.emailId ?? '';
+    _userNameController.text = userProvider.getUser()?.userName ?? '';
   }
 
   @override
@@ -33,7 +31,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
-          key: _formKey, // Przypisanie klucza formularza
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -55,7 +53,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               TextFormField(
-                controller: _passwordController, // Nowe pole hasła
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(labelText: 'Password'),
                 validator: (value) {
@@ -76,7 +74,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         backgroundColor: Colors.deepPurple.shade800,
                       ),
                       onPressed: () {
-                        // Anuluj edycję i wróć do profilu
                         Navigator.pop(context, false);
                       },
                       child: const Text('Cancel',
@@ -92,8 +89,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           final enteredPassword = _passwordController.text;
-                          if (enteredPassword != widget.user.password) {
-                            // Hasło nie zgadza się z hasłem użytkownika
+                          if (enteredPassword !=
+                              userProvider.getUser()?.password) {
+                            // Handle incorrect password as needed
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
@@ -111,27 +109,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ),
                             );
                           } else {
-                            // Hasło jest prawidłowe, można kontynuować
                             final updatedEmail = _emailController.text;
                             final updatedUserName = _userNameController.text;
 
                             final updatedUser = User(
                               emailId: updatedEmail,
                               userName: updatedUserName,
-                              password: widget.user.password,
-                              profilePicture: widget.user.profilePicture,
+                              password: enteredPassword,
+                              profilePicture:
+                                  userProvider.getUser()?.profilePicture,
                             );
 
+                            // Update user data in the provider
+                            userProvider.setUser(updatedUser);
+
+                            // Save the updated user data via the API
                             userApiService
-                                .updateUser(updatedUser)
+                                .updateUser(
+                              updatedUser,
+                              oldEmailId: userProvider.getUser()?.emailId,
+                            )
                                 .then((response) {
                               if (response ==
                                   'Dane użytkownika zostały zaktualizowane.') {
                                 Navigator.pop(context, true);
                               } else {
-                                print(response);
+                                // Handle response as needed
                               }
                             }).catchError((error) {
+                              // Handle error as needed
                               print(
                                   'Błąd podczas aktualizacji danych użytkownika: $error');
                             });
