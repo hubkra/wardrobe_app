@@ -4,7 +4,6 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:wardrobe_app/widgets/profile_page.dart';
-import '../models/wardrobe.dart';
 import '../providers/user_provider.dart';
 import 'outfit/outfits-card.dart';
 import 'wardrobe_page.dart';

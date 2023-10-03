@@ -73,6 +73,11 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Image.asset(
+                  'assets/logo.png',
+                  width: 500,
+                  height: 100,
+                ),
                 const Icon(
                   Icons.checkroom,
                   size: 100,
