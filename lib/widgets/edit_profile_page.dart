@@ -28,6 +28,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFEEF5DB),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -71,7 +72,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     width: MediaQuery.of(context).size.width * 0.4,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple.shade800,
+                        backgroundColor: const Color(0xFF4F6367),
                       ),
                       onPressed: () {
                         Navigator.pop(context, false);
@@ -84,7 +85,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     width: MediaQuery.of(context).size.width * 0.4,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple.shade800,
+                        backgroundColor: const Color(0xFF4F6367),
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {

@@ -43,6 +43,7 @@ class _OutfitsCardState extends State<OutfitsCard> {
         } else {
           final Outfit outfit = snapshot.data!;
           return Card(
+            color: const Color(0xFFB8D8D8),
             child: Container(
               padding: const EdgeInsets.all(16),
               child: Column(

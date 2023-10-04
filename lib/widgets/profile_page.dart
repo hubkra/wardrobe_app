@@ -105,6 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFEEF5DB),
       body: FutureBuilder<User>(
         future: _userFuture,
         builder: (context, snapshot) {
@@ -165,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     _selectNewAvatar();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple.shade800,
+                    backgroundColor: const Color(0xFF4F6367),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20.0,
                       vertical: 24.0,
@@ -174,7 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: const Text(
                     'Change Avatar',
                     style: TextStyle(
-                      color: Colors.white, // Kolor tekstu na przycisku
+                      color: Color(0xFFEEF5DB), // Kolor tekstu na przycisku
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -200,7 +201,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple.shade800,
+                    backgroundColor: const Color(0xFF4F6367),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20.0,
                       vertical: 24.0,
@@ -209,7 +210,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: const Text(
                     'Edit Profile',
                     style: TextStyle(
-                      color: Colors.white, // Kolor tekstu na przycisku
+                      color: Color(0xFFEEF5DB), // Kolor tekstu na przycisku
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -233,7 +234,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple.shade800,
+                    backgroundColor: const Color(0xFF4F6367),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20.0,
                       vertical: 24.0,
@@ -242,7 +243,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: const Text(
                     'Edit Password',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFFEEF5DB),
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -254,7 +255,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     _logoutUser();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 199, 0, 0),
+                    backgroundColor: const Color(0xFFFE5F55),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20.0,
                       vertical: 24.0,
@@ -263,7 +264,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: const Text(
                     'Logout',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFFEEF5DB),
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                     ),

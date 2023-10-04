@@ -66,18 +66,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: const Color(0xFFB8D8D8),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/logo.png',
-                  width: 500,
-                  height: 100,
-                ),
                 const Icon(
                   Icons.checkroom,
                   size: 100,
@@ -104,8 +99,8 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      border: Border.all(color: Colors.white),
+                      color: const Color(0xFFEEF5DB),
+                      border: Border.all(color: const Color(0xFFEEF5DB)),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Padding(
@@ -125,8 +120,8 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      border: Border.all(color: Colors.white),
+                      color: const Color(0xFFEEF5DB),
+                      border: Border.all(color: const Color(0xFFEEF5DB)),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Padding(
@@ -152,8 +147,8 @@ class _LoginPageState extends State<LoginPage> {
                         padding: MaterialStateProperty.all<EdgeInsets>(
                           const EdgeInsets.all(20),
                         ),
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.deepPurple),
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color(0xFF4F6367)),
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(

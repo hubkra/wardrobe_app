@@ -90,6 +90,7 @@ class _WardrobePageState extends State<WardrobePage>
         _wardrobes.add(addedClothes);
         _filteredWardrobes.add(addedClothes);
       });
+      // ignore: empty_catches
     } catch (error) {}
   }
 
@@ -101,6 +102,7 @@ class _WardrobePageState extends State<WardrobePage>
           _wardrobes.removeWhere((wardrobe) => wardrobe.id == id);
           _filteredWardrobes.removeWhere((wardrobe) => wardrobe.id == id);
         });
+        // ignore: empty_catches
       } catch (error) {}
     }
   }
@@ -117,6 +119,7 @@ class _WardrobePageState extends State<WardrobePage>
           _filteredWardrobes[index] = updatedClothes;
         }
       });
+      // ignore: empty_catches
     } catch (error) {}
   }
 
@@ -212,7 +215,7 @@ class _WardrobePageState extends State<WardrobePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: const Color(0xFFEEF5DB),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,11 +246,11 @@ class _WardrobePageState extends State<WardrobePage>
                   TabBar(
                     unselectedLabelColor: Colors.black,
                     indicator: BoxDecoration(
-                      color: Colors.deepPurple.shade800,
+                      color: const Color(0xFF4F6367),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     controller: _tabController,
-                    labelColor: Colors.white,
+                    labelColor: const Color(0xFFEEF5DB),
                     tabs: const [
                       Tab(text: 'Clothes'),
                       Tab(text: 'Outfits'),
@@ -276,7 +279,7 @@ class _WardrobePageState extends State<WardrobePage>
                           children: [
                             IconButton(
                               icon: const Icon(Icons.edit),
-                              color: Colors.deepPurple.shade800,
+                              color: const Color(0xFF4F6367),
                               hoverColor: Colors.transparent,
                               onPressed: () {
                                 _handleEdit(wardrobe);
@@ -285,7 +288,7 @@ class _WardrobePageState extends State<WardrobePage>
                             IconButton(
                               icon: const Icon(Icons.delete),
                               hoverColor: Colors.transparent,
-                              color: Colors.red,
+                              color: const Color(0xFFFE5F55),
                               onPressed: () {
                                 _deleteClothes(wardrobe.id);
                               },
@@ -313,7 +316,7 @@ class _WardrobePageState extends State<WardrobePage>
                                   Text('Outfit: ${outfit.name.toString()}'),
                                   IconButton(
                                     icon: const Icon(Icons.delete,
-                                        color: Colors.redAccent),
+                                        color: Color(0xFFFE5F55)),
                                     hoverColor: Colors.transparent,
                                     onPressed: () {
                                       _deleteOutfit(outfit.id, index);
@@ -321,7 +324,7 @@ class _WardrobePageState extends State<WardrobePage>
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.edit),
-                                    color: Colors.deepPurple.shade800,
+                                    color: const Color(0xFF4F6367),
                                     onPressed: () {
                                       _handleEditOutfit(outfit);
                                     },
@@ -358,7 +361,7 @@ class _WardrobePageState extends State<WardrobePage>
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
-                  backgroundColor: Colors.deepPurple.shade800,
+                  backgroundColor: const Color(0xFF4F6367),
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
@@ -372,6 +375,7 @@ class _WardrobePageState extends State<WardrobePage>
                   child: const Icon(
                     Icons.add,
                     size: 32.0,
+                    color: Color(0xFFEEF5DB),
                   ),
                 ),
               ),
@@ -396,7 +400,7 @@ class _WardrobePageState extends State<WardrobePage>
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple.shade800,
+                    backgroundColor: const Color(0xFF4F6367),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16.0),
                     ),
@@ -406,6 +410,7 @@ class _WardrobePageState extends State<WardrobePage>
                   child: const Icon(
                     Icons.checkroom_rounded,
                     size: 32.0,
+                    color: Color(0xFFEEF5DB),
                   ),
                 ),
               ),

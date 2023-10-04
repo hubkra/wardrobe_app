@@ -32,6 +32,7 @@ class _AddClothesFormState extends State<AddClothesForm> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
+      color: const Color(0xFFEEF5DB),
       child: Form(
         key: _formKey,
         child: Column(
@@ -100,7 +101,7 @@ class _AddClothesFormState extends State<AddClothesForm> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple.shade800,
+                backgroundColor: const Color(0xFF4F6367),
               ),
               child: const Text('Add'),
             ),

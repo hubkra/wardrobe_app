@@ -42,16 +42,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      backgroundColor: Colors.grey[300],
+      backgroundColor: const Color(0xFFEEF5DB),
       bottomNavigationBar: Container(
         color: Colors.black,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20),
           child: GNav(
             backgroundColor: Colors.black,
-            color: Colors.white,
-            activeColor: Colors.white,
-            tabBackgroundColor: Colors.deepPurple.shade800,
+            color: const Color(0xFFEEF5DB),
+            activeColor: const Color(0xFFEEF5DB),
+            tabBackgroundColor: const Color(0xFF4F6367),
             gap: 8,
             padding: const EdgeInsets.all(16),
             tabs: const [
@@ -111,11 +111,11 @@ class _HomePageContentState extends State<HomePageContent> {
             headerStyle: const HeaderStyle(
               formatButtonVisible: false,
             ),
-            calendarStyle: CalendarStyle(
-              weekendTextStyle: const TextStyle(color: Colors.red),
-              holidayTextStyle: const TextStyle(color: Colors.blue),
+            calendarStyle: const CalendarStyle(
+              weekendTextStyle: TextStyle(color: Colors.red),
+              holidayTextStyle: TextStyle(color: Colors.blue),
               todayDecoration: BoxDecoration(
-                color: Colors.deepPurple.shade800,
+                color: Color(0xFF4F6367),
                 shape: BoxShape.circle,
               ),
             ),

@@ -24,6 +24,7 @@ class _AddOutfitFormState extends State<AddOutfitForm> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
+      color: const Color(0xFFEEF5DB),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -67,7 +68,7 @@ class _AddOutfitFormState extends State<AddOutfitForm> {
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple.shade800,
+              backgroundColor: const Color(0xFF4F6367),
             ),
             child: const Text('Dodaj Stroj'),
           ),

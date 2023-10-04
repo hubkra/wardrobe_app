@@ -47,6 +47,7 @@ class _OutfitContainerState extends State<OutfitContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: const Color(0xFFB8D8D8),
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(

@@ -37,7 +37,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: const Color(0xFFB8D8D8),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -65,7 +65,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: const Color(0xFFEEF5DB),
                     border: Border.all(
                       color: isEmailValid
                           ? Colors.white
@@ -109,7 +109,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: const Color(0xFFEEF5DB),
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -133,7 +133,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: const Color(0xFFEEF5DB),
                     border: Border.all(
                       color: isPasswordValid
                           ? Colors.white
@@ -184,8 +184,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       padding: MaterialStateProperty.all<EdgeInsets>(
                         const EdgeInsets.all(20),
                       ),
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.deepPurple),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFF4F6367),
+                      ),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
