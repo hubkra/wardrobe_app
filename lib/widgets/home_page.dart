@@ -97,66 +97,59 @@ class _HomePageContentState extends State<HomePageContent> {
     final username =
         Provider.of<UserProvider>(context).getUser()?.emailId ?? "";
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TableCalendar(
-            calendarFormat: CalendarFormat.week,
-            focusedDay: DateTime.now(),
-            firstDay:
-                DateTime.utc(DateTime.now().year, DateTime.now().month, 1),
-            lastDay:
-                DateTime.utc(DateTime.now().year, DateTime.now().month + 1, 0),
-            headerStyle: const HeaderStyle(
-              formatButtonVisible: false,
-            ),
-            calendarStyle: const CalendarStyle(
-              weekendTextStyle: TextStyle(color: Colors.red),
-              holidayTextStyle: TextStyle(color: Colors.blue),
-              todayDecoration: BoxDecoration(
-                color: Color(0xFF4F6367),
-                shape: BoxShape.circle,
+    return SingleChildScrollView(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TableCalendar(
+              calendarFormat: CalendarFormat.week,
+              focusedDay: DateTime.now(),
+              firstDay:
+                  DateTime.utc(DateTime.now().year, DateTime.now().month, 1),
+              lastDay: DateTime.utc(
+                  DateTime.now().year, DateTime.now().month + 1, 0),
+              headerStyle: const HeaderStyle(
+                formatButtonVisible: false,
+              ),
+              calendarStyle: const CalendarStyle(
+                weekendTextStyle: TextStyle(color: Colors.red),
+                holidayTextStyle: TextStyle(color: Colors.blue),
+                todayDecoration: BoxDecoration(
+                  color: Color(0xFF4F6367),
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  Text(
-                    'Good morning',
-                    style: GoogleFonts.bebasNeue(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    username,
-                    style: GoogleFonts.bebasNeue(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 20,
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width - 40,
-                        height: 550,
-                        child: OutfitsCard(outfitId: widget.outfitId),
-                      ),
-                    ],
-                  )
-                ],
+            const SizedBox(height: 20),
+            Text(
+              'Good morning',
+              style: GoogleFonts.bebasNeue(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Text(
+              username,
+              style: GoogleFonts.bebasNeue(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Wrap(
+              spacing: 20,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  height: 550,
+                  child: OutfitsCard(outfitId: widget.outfitId),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
