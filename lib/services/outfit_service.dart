@@ -20,24 +20,22 @@ class OutfitService {
     }
   }
 
-  Future<Outfit> createOutfit(String name, List<Wardrobe> wardrobeItems) async {
+  Future<void> createOutfit(String name, List<Wardrobe> wardrobeItems) async {
     final Map<String, dynamic> requestBody = {
       'wardrobeItems': wardrobeItems.map((item) => item.toJson()).toList(),
       'name': name
     };
 
-    final response = await http.post(
-      Uri.parse('http://localhost:8080/api/outfits'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(requestBody),
-    );
+    try {
+      await http.post(
+        Uri.parse('http://localhost:8080/api/outfits'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(requestBody),
+      );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> json = jsonDecode(response.body);
-      final Outfit newOutfit = Outfit.fromJson(json);
-      return newOutfit;
-    } else {
-      throw Exception('Request failed with status: ${response.statusCode}.');
+      print('Pomyślnie wysłano żądanie utworzenia stroju.');
+    } catch (error) {
+      print('Błąd podczas wysyłania żądania utworzenia stroju: $error');
     }
   }
 
@@ -60,7 +58,7 @@ class OutfitService {
       Uri.parse('http://localhost:8080/api/outfits/$id'),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 204) {
       // Outfit usunięty pomyślnie
     } else {
       throw Exception('Request failed with status: ${response.statusCode}.');

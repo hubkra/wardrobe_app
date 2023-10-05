@@ -25,7 +25,6 @@ class _WardrobePageState extends State<WardrobePage>
   List<Wardrobe> _filteredWardrobes = [];
   List<Outfit> _outfits = [];
   List<Outfit> _filteredOutfits = [];
-  final GlobalKey<AnimatedListState> _outfitsListKey = GlobalKey();
 
   @override
   void initState() {
@@ -70,15 +69,16 @@ class _WardrobePageState extends State<WardrobePage>
   Future<void> _deleteOutfit(int? id, int index) async {
     if (id != null) {
       try {
-        print('called before. setstate');
         await _outfitService.deleteOutfit(id);
+
+        final outfits = await _outfitService.fetchOutfits();
+
         setState(() {
-          _outfits.removeAt(index);
-          _filteredOutfits.removeAt(index);
-          print('setState was called successfully.');
+          _outfits = outfits;
+          _filteredOutfits = List.from(outfits);
         });
       } catch (error) {
-        print(error);
+        print("Błąd podczas usuwania outfitu: $error");
       }
     }
   }
@@ -125,13 +125,14 @@ class _WardrobePageState extends State<WardrobePage>
 
   Future<void> _createOutfit(String name, List<Wardrobe> wardrobeItems) async {
     try {
-      final newOutfit = await _outfitService.createOutfit(name, wardrobeItems);
+      await _outfitService.createOutfit(name, wardrobeItems);
+      final outfits = await _fetchOutfits();
       setState(() {
-        _outfits.add(newOutfit);
-        _filteredOutfits.add(newOutfit);
+        _outfits = outfits;
+        _filteredOutfits = List.from(_outfits);
       });
     } catch (error) {
-      // Handle the error
+      print("Błąd podczas tworzenia outfitu: $error");
     }
   }
 
@@ -300,7 +301,6 @@ class _WardrobePageState extends State<WardrobePage>
                   ),
                   Builder(builder: (BuildContext context) {
                     return ListView.builder(
-                      key: _outfitsListKey,
                       itemCount: _filteredOutfits.length,
                       itemBuilder: (BuildContext context, int index) {
                         final outfit = _filteredOutfits[index];
