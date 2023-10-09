@@ -27,7 +27,13 @@ class _EditOutfitFormState extends State<EditOutfitForm> {
   void initState() {
     super.initState();
     _outfitNameController.text = widget.outfit.name ?? '';
-    selectedItems = List.from(widget.selectedWardrobeItems);
+
+    selectedItems = List<Wardrobe>.from(widget.selectedWardrobeItems);
+    for (var wardrobeItem in widget.wardrobeItems) {
+      if (!selectedItems.contains(wardrobeItem)) {
+        selectedItems.add(wardrobeItem);
+      }
+    }
   }
 
   @override
@@ -48,28 +54,26 @@ class _EditOutfitFormState extends State<EditOutfitForm> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: widget.wardrobeItems.length,
+              itemCount: selectedItems.length,
               itemBuilder: (BuildContext context, int index) {
-                final wardrobeItem = widget.wardrobeItems[index];
-                final isSelected = selectedItems.contains(wardrobeItem);
+                final wardrobeItem = selectedItems[index];
 
                 return ListTile(
                   leading: Checkbox(
-                    value: isSelected,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        if (value != null) {
-                          if (value) {
-                            selectedItems.add(wardrobeItem);
-                          } else {
-                            selectedItems.remove(wardrobeItem);
-                          }
-                        }
-                      });
-                    },
+                    value: true,
+                    onChanged: null, // Zablokowanie zmiany checkboxa
                   ),
                   title: Text(wardrobeItem.name),
                   subtitle: Text(wardrobeItem.typeClothes),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    color: const Color(0xFFFE5F55),
+                    onPressed: () {
+                      setState(() {
+                        selectedItems.remove(wardrobeItem);
+                      });
+                    },
+                  ),
                 );
               },
             ),

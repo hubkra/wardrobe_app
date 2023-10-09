@@ -177,7 +177,7 @@ class _WardrobePageState extends State<WardrobePage>
     });
   }
 
-  void _handleEditOutfit(Outfit outfit) {
+  void _handleEditOutfit(Outfit outfit) async {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
