@@ -22,18 +22,26 @@ class EditOutfitForm extends StatefulWidget {
 class _EditOutfitFormState extends State<EditOutfitForm> {
   List<Wardrobe> selectedItems = [];
   final TextEditingController _outfitNameController = TextEditingController();
+  List<bool> isSelectedList = [];
 
   @override
   void initState() {
     super.initState();
     _outfitNameController.text = widget.outfit.name ?? '';
 
-    selectedItems = List<Wardrobe>.from(widget.selectedWardrobeItems);
-    for (var wardrobeItem in widget.wardrobeItems) {
-      if (!selectedItems.contains(wardrobeItem)) {
-        selectedItems.add(wardrobeItem);
-      }
-    }
+    selectedItems = widget.selectedWardrobeItems
+        .where((outfitItem) => widget.wardrobeItems
+            .any((wardrobeItem) => wardrobeItem.id == outfitItem.id))
+        .toList();
+
+    isSelectedList = List.generate(
+      widget.wardrobeItems.length,
+      (index) {
+        final isItemSelected =
+            selectedItems.contains(widget.wardrobeItems[index]);
+        return isItemSelected;
+      },
+    );
   }
 
   @override
@@ -54,40 +62,57 @@ class _EditOutfitFormState extends State<EditOutfitForm> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: selectedItems.length,
+              itemCount: widget.wardrobeItems.length,
               itemBuilder: (BuildContext context, int index) {
-                final wardrobeItem = selectedItems[index];
+                final wardrobeItem = widget.wardrobeItems[index];
+                final isSelected = selectedItems.any(
+                    (selectedItem) => selectedItem.name == wardrobeItem.name);
 
                 return ListTile(
                   leading: Checkbox(
-                    value: true,
-                    onChanged: null, // Zablokowanie zmiany checkboxa
-                  ),
-                  title: Text(wardrobeItem.name),
-                  subtitle: Text(wardrobeItem.typeClothes),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    color: const Color(0xFFFE5F55),
-                    onPressed: () {
+                    value: isSelected,
+                    onChanged: (bool? value) {
                       setState(() {
-                        selectedItems.remove(wardrobeItem);
+                        if (value == true) {
+                          selectedItems.add(wardrobeItem);
+                        } else {
+                          selectedItems.removeWhere((selectedItem) =>
+                              selectedItem.name == wardrobeItem.name);
+                        }
                       });
                     },
                   ),
+                  title: Text(wardrobeItem.name),
+                  subtitle: Text(wardrobeItem.typeClothes),
                 );
               },
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              widget.onUpdateOutfit(_outfitNameController.text, selectedItems);
-              Navigator.of(context).pop();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F6367),
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: const Color(0xFFEEF5DB),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        widget.onUpdateOutfit(
+                            _outfitNameController.text, selectedItems);
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4F6367),
+                      ),
+                      child: const Text('Update Outfit'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            child: const Text('Update Outfit'),
-          ),
+          )
         ],
       ),
     );
